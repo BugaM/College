@@ -130,3 +130,7 @@ dmypy.json
 
 # VSCode
 .vscode
+
+#Ignoring pdfs and zips
+.pdf
+.zip
