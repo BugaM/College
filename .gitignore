@@ -134,3 +134,7 @@ dmypy.json
 #Ignoring pdfs and zips
 .pdf
 .zip
+
+#Ignoring images
+.png
+.jpeg
