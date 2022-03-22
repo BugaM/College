@@ -132,15 +132,10 @@ dmypy.json
 .vscode
 
 #Ignoring pdfs and zips
-.pdf
-pdf
-zip
-.zip
+*.pdf
+*.zip
 
 #Ignoring images
-.png
-png
-.jpeg
-jpeg
-.eps
-eps
+*.png
+*.jpeg
+*.eps
