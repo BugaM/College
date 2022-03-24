@@ -1,7 +1,5 @@
 #ifndef LAB1_HASH_H
 #define LAB1_HASH_H
-// DONT KNOW WHAT IS THIS #ifndef stuff? see:
-// https://en.wikipedia.org/wiki/Include_guard
 
 #include <vector>
 #include <forward_list>
@@ -9,11 +7,6 @@
 #include <cassert>
 #include <iostream>
 
-/*
- * for didactical purposes every method is public, it is more transparent than usual  
- * the method hash could be private
- * and the worst_case method usually do not exist. 
- */
 class Hash {
     
 public:

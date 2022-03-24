@@ -1,8 +1,5 @@
 #include "hash.h"
 
-// LOOK FOR THE COMMENTS IN THE .H 
-// TO UNDERSTAND WHAT EACH FUNCTION MUST DO
-
 Hash::Hash(int tablesize, int (*hf) (std::string) ) {
     _table.resize(tablesize);
     _hash_func = hf;
@@ -16,11 +13,6 @@ int Hash::add(std::string str, int &collisions) {
         return 0;
     }
     _table[bucket].push_front(str);
-
-    // porque existe 'return 0' neste codigo? 
-    // para executar os testes, mesmo falhando, eh preciso compilar
-    // assim, eh preciso retornar algum valor.
-    // ** o aluno deve implementar a funcao completa e retornar o valor correto **
     return 1;
     
 }//add
@@ -56,7 +48,6 @@ int Hash::contains(std::string str, int &collisions) {
             return 1;
         }
     }
-
     return 0;
     
 }//contains
