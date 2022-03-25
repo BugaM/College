@@ -21,7 +21,15 @@ int Hash::remove(std::string str, int &collisions) {
     
     if (contains(str, collisions)){
         int bucket = hash(str);
-        _table[bucket].remove(str);
+        std::forward_list<std::string> *list = &_table[bucket];
+        auto it = list->begin();
+        if (collisions == 1){
+            list->pop_front();
+        }
+        else{
+            std::advance(it, collisions-2);
+            list->erase_after(it);
+        }
         return 1;
     }
     return 0;
@@ -37,12 +45,12 @@ int Hash::hash(std::string str) {
 int Hash::contains(std::string str, int &collisions) { 
 
     int bucket = hash(str);
-    std::forward_list<std::string> list = _table[bucket];
+    std::forward_list<std::string> *list = &_table[bucket];
 
     //Create an iterator of std::list
     std::forward_list<std::string>::iterator it;
     collisions = 0;
-    for (it = list.begin(); it!= list.end(); it++){
+    for (it = list->begin(); it!= list->end(); it++){
         collisions ++;
         if (*it == str){
             return 1;
