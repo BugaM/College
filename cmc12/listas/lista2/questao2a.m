@@ -4,6 +4,6 @@ function tau = questao2a(R, Kt, J, b)
 % indutancia L eh desprezivel. De sua resposta em funcao dos parametros
 % do motor.
 
- tau = R*J/(Kt^2 + R*b); 
+tau = R*J/(Kt^2 + R*b); 
 
 end
