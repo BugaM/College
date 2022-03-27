@@ -1,6 +1,6 @@
 % attention: the "1+" is there because matlab indexes start on 1, not in
 % zero like in the theory.
-modsumchar60 = @(str) (1+mod( sum(str - char(0)),60)); 
+modsumchar15 = @(str) (1+mod( sum(str - char(0)),15)); 
 mod1stChar29 = @(str) (1+mod( (str(1) - char(0)),29)); 
 modsumchar29 = @(str) (1+mod( sum(str - char(0)),29)); 
 mod1stChar30 = @(str) (1+mod( (str(1) - char(0)),30)); 

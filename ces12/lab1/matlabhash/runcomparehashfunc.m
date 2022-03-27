@@ -34,4 +34,4 @@ filenames = { 'data/random.txt', 'data/startend.txt' , 'data/length8.txt' 'data/
 filenames{end+1} = 'data/huckfinn.txt';
 
 % change hashfunction1 to hashfunctionX to run other exercises.
-comparehashfuncs(hashfunctions5, filenames);
+comparehashfuncs(hashfunctions4, filenames);
