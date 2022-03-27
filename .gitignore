@@ -141,3 +141,4 @@ dmypy.json
 *.eps
 *cmake-build-debug
 *.idea
+*.jpg
