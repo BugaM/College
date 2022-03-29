@@ -16,5 +16,5 @@ vtheta0 = [theta0, dtheta0];
 
 f = @(t,theta) [theta(2);(-b*theta(2)-m*g*sin(theta(1)))/(m*l)];
 [~, theta] = ode45(f, t, vtheta0);
-plot(t,theta(:,1))
+% plot(t,theta(:,1))
 end
