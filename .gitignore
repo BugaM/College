@@ -142,3 +142,11 @@ dmypy.json
 *cmake-build-debug
 *.idea
 *.jpg
+
+# Matlab stuff
+
+*.autosave
+*.asv
+*.slxc
+slprj/
+
