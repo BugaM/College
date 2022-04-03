@@ -57,20 +57,19 @@ Kp = m/tau - b;
 % plot(out.v.time, out.v.signals.values)
 % hold on
 % grid on
-% ylim([0,32])
-% 
+
 % d = 200;
 % out = sim('cruise_control_fechada.slx');
 % plot(out.v.time, out.v.signals.values)
-% 
+
 % d = 300;
 % out = sim('cruise_control_fechada.slx');
 % plot(out.v.time, out.v.signals.values)
-% 
-% legend('v_r=10 m/s', 'v_r=20 m/s', 'v_r=30 m/s')
+
+% legend('d=100 N', 'd=200 N', 'd=300 N')
 % xlabel('Tempo ($s$)', Interpreter='latex', FontSize=15)
 % ylabel('Velocidade ($m/s$)', Interpreter='latex', FontSize=15)
-% 
+
 % print -depsc2 2_3c.eps
 
 
