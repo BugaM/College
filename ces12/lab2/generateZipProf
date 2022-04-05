@@ -1,0 +1,6 @@
+#!/bin/bash
+FDATE=`date +'%y%m%d_%H%M'`
+
+zip -r /tmp/labTree${FDATE}.zip data/ test/ lib/ src/ CMakeLists.txt* compilarLab* zipaPara* genera* 
+
+
