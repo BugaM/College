@@ -11,6 +11,8 @@
 class BlackRedTree {
 public: BlackRedTree();
         void add(double key, long idx, Node*& root);
+        void leftRotate(Node*& x);
+        void rightRotate(Node*& x);
         Node*& getRoot();
         long size(Node* node);
 private:
