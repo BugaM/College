@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <IndexPointsAbstract.h>
+#include "BlackRedTree.h"
 
 class IndexPointsAluno : public IndexPointsAbstract {
     
@@ -20,6 +21,8 @@ public:
 private: 
     // ALUNO DEVE IMPLEMENTAR ALGO COM O MESMO COMPORTAMENTO DE MULTIMAP
     std::multimap<double, long> _map;
+    BlackRedTree _tree;
+
     
 };//class
 

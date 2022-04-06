@@ -2,10 +2,10 @@
 #include <IndexPointsAluno.h>
 
 /// returns the number of elements in the index
-long IndexPointsAluno::size() { return _map.size(); }
+long IndexPointsAluno::size() { return _tree.size(_tree.getRoot()); }
 
 /// adds new element to the index. 
-void IndexPointsAluno::add (double key, long idx ) { _map.insert(std::make_pair(key,idx)) ; }
+void IndexPointsAluno::add (double key, long idx ) { _tree.add(key,idx, _tree.getRoot()); }
 
 
 void IndexPointsAluno::find(std::vector<long> &res, double first, double last ) {
