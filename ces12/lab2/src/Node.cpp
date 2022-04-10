@@ -4,11 +4,18 @@
 
 #include "Node.h"
 
+Node::Node() {
+    left = nullptr;
+    right = nullptr;
+    parent = nullptr;
+    red = false;
+}
 
-Node::Node(double key, long idx, bool black) {
-    _black = black;
+Node::Node(double key, long idx) {
+    red = true;
     _key = key;
     _idx = idx;
     left = nullptr;
     right = nullptr;
+    parent = nullptr;
 }

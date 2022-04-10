@@ -5,18 +5,30 @@
 #ifndef LABTREE_NODE_H
 #define LABTREE_NODE_H
 
+#ifndef shp
+#define shp  std::shared_ptr
+#endif
+
+#ifndef mshp
+#define mshp std::make_shared
+#endif
+
+#include <memory>
 
 class Node {
 public:
-    Node(double key, long idx, bool black=true);
-    friend class BlackRedTree;
+    Node();
+    ~Node() = default;
+    Node(double key, long idx);
+    friend class RedBlackTree;
 
 private:
     double _key;
     long _idx;
-    bool _black;
-    Node *left;
-    Node *right;
+    bool red;
+    shp <Node> left;
+    shp <Node> right;
+    shp <Node> parent;
 };
 
 
