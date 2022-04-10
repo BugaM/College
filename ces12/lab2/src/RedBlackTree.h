@@ -5,33 +5,25 @@
 #ifndef LABTREE_REDBLACKTREE_H
 #define LABTREE_REDBLACKTREE_H
 
-#ifndef shp
-#define shp  std::shared_ptr
-#endif
-
-#ifndef mshp
-#define mshp std::make_shared
-#endif
-
 #include "Node.h"
-#include <memory>
 #include <vector>
 
 class RedBlackTree {
 public:
         RedBlackTree();
-        ~RedBlackTree() = default;
+        ~RedBlackTree();
         void add(double key, long idx);
-        void leftRotate(shp<Node> x);
-        void rightRotate(shp<Node> x);
-        void insertFixUp(shp<Node> z);
+        void destroyTree(Node* &node);
+        void leftRotate(Node* x);
+        void rightRotate(Node* x);
+        void insertFixUp(Node* z);
         long size();
         void find(std::vector<long> &res, double first, double last );
-        void smartInOrder(shp<Node> &node, std::vector<long> &res, double first, double last);
+        void smartInOrder(Node* &node, std::vector<long> &res, double first, double last);
 private:
-        shp<Node> _root;
-        shp<Node> NIL;
-        long size(shp<Node> &node);
+        Node* _root;
+        Node* NIL;
+        long size(Node* &node);
 
 };
 

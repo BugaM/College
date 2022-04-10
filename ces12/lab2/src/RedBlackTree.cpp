@@ -3,35 +3,30 @@
 //
 
 #include "RedBlackTree.h"
-#include <iostream>
-
 
 RedBlackTree::RedBlackTree() {
-    NIL = mshp<Node>();
+    NIL = new Node();
     _root = NIL;
 }
 
-//void RedBlackTree::add(double key, long idx, Node *&root) {
-//    if (!root){
-//        root = new Node(key, idx);
-//    }
-//    else {
-//        if (key < root->_key){
-//            add(key, idx, root->left);
-//            root->left->parent = root;
-//        }
-//        else{
-//            add(key, idx, root->right);
-//            root->right->parent = root;
-//        }
-//    }
-//}
+RedBlackTree::~RedBlackTree() {
+    destroyTree(_root);
+    delete NIL;
+}
+
+void RedBlackTree::destroyTree(Node* &node){
+    if (node != NIL) {
+        destroyTree(node->left);
+        destroyTree(node->right);
+        delete node;
+    }
+}
 
 void RedBlackTree::add(double key, long idx) {
-    shp<Node> y = NIL;
-    shp<Node> x = _root;
-    shp<Node> z = mshp<Node>(key, idx);
-    while (x.get() != NIL.get()){
+    Node* y = NIL;
+    Node* x = _root;
+    Node* z = new Node(key, idx);
+    while (x != NIL){
         y = x;
         if (key < x->_key){
             x = x->left;
@@ -41,7 +36,7 @@ void RedBlackTree::add(double key, long idx) {
         }
     }
     z->parent = y;
-    if (y.get() == NIL.get()){
+    if (y == NIL){
         _root = z;
     }
     else if (key < y->_key) {
@@ -56,10 +51,10 @@ void RedBlackTree::add(double key, long idx) {
     insertFixUp(z);
 }
 
-void RedBlackTree::insertFixUp(shp<Node> z){
-    shp<Node> y;
+void RedBlackTree::insertFixUp(Node* z){
+    Node* y;
     while (z->parent->red){
-        if (z->parent.get() == z->parent->parent->left.get()){
+        if (z->parent == z->parent->parent->left){
             y = z->parent->parent->right;
             if (y->red) {
                 z->parent->red = false;
@@ -67,7 +62,7 @@ void RedBlackTree::insertFixUp(shp<Node> z){
                 z->parent->parent->red = true;
                 z = z->parent->parent;
             }
-            else if (z.get() == z->parent->right.get()){
+            else if (z == z->parent->right){
                 z = z->parent;
                 leftRotate(z);
             }
@@ -85,7 +80,7 @@ void RedBlackTree::insertFixUp(shp<Node> z){
                 z->parent->parent->red = true;
                 z = z->parent->parent;
             }
-            else if (z.get() == z->parent->left.get()){
+            else if (z == z->parent->left){
                 z = z->parent;
                 rightRotate(z);
             }
@@ -99,18 +94,18 @@ void RedBlackTree::insertFixUp(shp<Node> z){
     _root->red = false;
 }
 
-void RedBlackTree::leftRotate(shp<Node> x){
-    shp<Node> y;
+void RedBlackTree::leftRotate(Node* x){
+    Node* y;
     y = x->right;
     x->right = y->left;
     if (y->left){
         y->left->parent = x;
     }
     y->parent = x->parent;
-    if (x->parent.get() == NIL.get()){
+    if (x->parent == NIL){
         _root = y;
     }
-    else if (x.get() == x->parent->left.get()){
+    else if (x == x->parent->left){
         x->parent->left = y;
     }
     else{
@@ -120,18 +115,18 @@ void RedBlackTree::leftRotate(shp<Node> x){
     x->parent = y;
 }
 
-void RedBlackTree::rightRotate(shp<Node> x){
-    shp<Node> y;
+void RedBlackTree::rightRotate(Node* x){
+    Node* y;
     y = x->left;
     x->left = y->right;
     if (y->right){
         y->right->parent = x;
     }
     y->parent = x->parent;
-    if (x->parent.get() == NIL.get()){
+    if (x->parent == NIL){
         _root = y;
     }
-    else if (x.get() == x->parent->right.get()){
+    else if (x == x->parent->right){
         x->parent->right = y;
     }
     else{
@@ -145,8 +140,9 @@ long RedBlackTree::size(){
     return size(_root);
 }
 
-long RedBlackTree::size(shp<Node> &node){
-    if (node.get() == NIL.get()){
+long RedBlackTree::size(Node* &node){
+//    Auxiliar recursive function for binary tree size
+    if (node == NIL){
         return 0;
     }
     else {
@@ -158,8 +154,9 @@ void RedBlackTree::find(std::vector<long> &res, double first, double last ){
     smartInOrder(_root , res, first, last);
 }
 
-void RedBlackTree::smartInOrder(shp<Node> &node, std::vector<long> &res, double first, double last ){
-    if (node.get() == NIL.get()) {
+void RedBlackTree::smartInOrder(Node* &node, std::vector<long> &res, double first, double last ){
+//    auxiliar recursive function for a "smart" inorder for the given problem
+    if (node == NIL) {
         return;
     }
     if (node->_key < first){
