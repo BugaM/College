@@ -5,6 +5,9 @@
 #ifndef LABTREE_NODE_H
 #define LABTREE_NODE_H
 
+#define RED true
+#define BLACK false
+
 
 class Node {
 public:
@@ -16,7 +19,7 @@ public:
 private:
     double _key;
     long _idx;
-    bool red;
+    bool color;
     Node* left;
     Node* right;
     Node* parent;

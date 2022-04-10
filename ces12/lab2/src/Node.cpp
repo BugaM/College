@@ -8,11 +8,11 @@ Node::Node() {
     left = nullptr;
     right = nullptr;
     parent = nullptr;
-    red = false;
+    color = BLACK;
 }
 
 Node::Node(double key, long idx) {
-    red = true;
+    color = RED;
     _key = key;
     _idx = idx;
     left = nullptr;

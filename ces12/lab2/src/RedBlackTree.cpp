@@ -47,19 +47,19 @@ void RedBlackTree::add(double key, long idx) {
     }
     z->left = NIL;
     z->right = NIL;
-    z->red = true;
+    z->color = RED;
     insertFixUp(z);
 }
 
 void RedBlackTree::insertFixUp(Node* z){
     Node* y;
-    while (z->parent->red){
+    while (z->parent->color == RED){
         if (z->parent == z->parent->parent->left){
             y = z->parent->parent->right;
-            if (y->red) {
-                z->parent->red = false;
-                y->red = false;
-                z->parent->parent->red = true;
+            if (y->color == RED) {
+                z->parent->color = BLACK;
+                y->color = BLACK;
+                z->parent->parent->color = RED;
                 z = z->parent->parent;
             }
             else if (z == z->parent->right){
@@ -67,17 +67,17 @@ void RedBlackTree::insertFixUp(Node* z){
                 leftRotate(z);
             }
             else{
-                z->parent->red = false;
-                z->parent->parent->red = true;
+                z->parent->color = BLACK;
+                z->parent->parent->color = RED;
                 rightRotate(z->parent->parent);
             }
         }
         else {
             y = z->parent->parent->left;
-            if (y->red) {
-                z->parent->red = false;
-                y->red = false;
-                z->parent->parent->red = true;
+            if (y->color == RED) {
+                z->parent->color = BLACK;
+                y->color = BLACK;
+                z->parent->parent->color = RED;
                 z = z->parent->parent;
             }
             else if (z == z->parent->left){
@@ -85,13 +85,13 @@ void RedBlackTree::insertFixUp(Node* z){
                 rightRotate(z);
             }
             else{
-                z->parent->red = false;
-                z->parent->parent->red = true;
+                z->parent->color = BLACK;
+                z->parent->parent->color = RED;
                 leftRotate(z->parent->parent);
             }
         }
     }
-    _root->red = false;
+    _root->color = BLACK;
 }
 
 void RedBlackTree::leftRotate(Node* x){
