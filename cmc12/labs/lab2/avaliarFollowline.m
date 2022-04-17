@@ -6,6 +6,7 @@ inicializarFollowline;
 %% Testes com robo se movendo para frente
 % Valores de yr usados na avaliacao
 yrs = -0.5:0.1:0.5;
+
 figure;
 hold on;
 for j=1:length(yrs)
@@ -18,8 +19,8 @@ ylabel('Y (m)', 'FontSize', 14);
 set(gca, 'FontSize', 14);
 grid minor;
 axis equal;
-print -dpng -r400 followline.png % for Word users
-% print -depsc2 followline.eps % for LaTeX users
+% print -dpng -r400 followline.png % for Word users
+print -depsc2 followline1.eps % for LaTeX users
 
 %% Testes com robo se movendo para tras
 xr = -1;
@@ -35,5 +36,5 @@ ylabel('Y (m)', 'FontSize', 14);
 set(gca, 'FontSize', 14);
 grid minor;
 axis equal;
-print -dpng -r400 followline.png % for Word users
-% print -depsc2 followline.eps % for LaTeX users
+% print -dpng -r400 followline2.png % for Word users
+print -depsc2 followline2.eps % for LaTeX users

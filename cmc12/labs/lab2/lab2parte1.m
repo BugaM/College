@@ -1,9 +1,10 @@
 inicializarFrontal
 
 out = sim('frontal.slx');
-plot(out.x.time, out.x.signals.values);
+plot(out.x.signals.values, out.x.time);
+ylabel('t(s)')
+xlabel('x(m)')
 hold on
 grid on
-ylim([0 1.2])
 
 print -depsc2 2_1.eps

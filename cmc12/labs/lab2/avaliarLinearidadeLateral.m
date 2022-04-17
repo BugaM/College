@@ -20,9 +20,9 @@ for i=1:length(y0s)
     title(sprintf('y_0 = %g', y0));
     set(gca, 'FontSize', 14);
     grid on;
-    filename = sprintf('linearidade_lateral_y_y0=%g.png', y0);
-    print('-dpng', '-r400', filename); % for Word users
-%     print('-depsc2', filename); % for LaTeX users
+    filename = sprintf('linearidade_lateral_y_y0=%g', y0);
+%     print('-dpng', '-r400', [filename, '.png']); % for Word users
+    print('-depsc2', [filename, '.eps']); % for LaTeX users
 
     figure;
     hold on;
@@ -34,7 +34,7 @@ for i=1:length(y0s)
     title(sprintf('y_0 = %g', y0));
     set(gca, 'FontSize', 14);
     grid on;
-    filename = sprintf('linearidade_lateral_psi_y0=%g.png', y0);
-    print('-dpng', '-r400', filename); % for Word users
-%     print('-depsc2', filename); % for LaTeX users
+    filename = sprintf('linearidade_lateral_psi_y0=%g', y0);
+%     print('-dpng', '-r400', [filename, '.png']); % for Word users
+    print('-depsc2', [filename, '.eps']); % for LaTeX users
 end
