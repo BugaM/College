@@ -5,7 +5,7 @@ function [F, C] = questao4()
 
 m = 1000;
 b = 50;
-wn = 2;
+wn = 2 * pi * 2;
 xi = 0.6;
 s = tf('s');
 
