@@ -1,0 +1,6 @@
+cd build
+make clean
+# permite mudar o diretorio onde estao as fontes do aluno
+cmake .. -DCES12_SRC:FILEPATH=$1
+make
+lab1tests
