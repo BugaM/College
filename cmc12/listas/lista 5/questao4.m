@@ -12,7 +12,7 @@ s = tf('s');
 Kp = m*wn^2;
 Kd = 2*xi*wn*m - b;
 
-C = 1/(m*s^2 + b*s);
+C = Kp + Kd*s;
 F = Kp/(Kp + Kd*s);
 
 
