@@ -27,6 +27,6 @@ void myradixsort(std::vector<int> &v, SortStats &stats) {
 
     }
     // not recursive
-    stats.recursive_calls = 1;
-    stats.depth_recursion_stack = 1;
+    stats.recursive_calls = 0;
+    stats.depth_recursion_stack = 0;
 }
