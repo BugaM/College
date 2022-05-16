@@ -38,8 +38,8 @@ for i=1:length(Ts)
     legs{i} = sprintf('f_s=%d Hz', fs(i));
 end
 legend(legs, 'FontSize', 14, 'Location', 'Southeast');
-print -dpng -r400 w_roda_discreto.png % para usuarios de Word
-% print -depsc2 w_roda_discreto.eps % para usuarios de LaTeX
+% print -dpng -r400 w_roda_discreto.png % para usuarios de Word
+print -depsc2 w_roda_discreto.eps % para usuarios de LaTeX
 
 figure;
 hold on;
@@ -53,5 +53,5 @@ for i=1:length(Ts)
     legs{i} = sprintf('f_s=%d Hz', fs(i));
 end
 legend(legs, 'FontSize', 14, 'Location', 'Southeast');
-print -dpng -r400 comando_discreto.png % para usuarios de Word
-% print -depsc2 comando_discreto.eps % para usuarios de LaTeX
+% print -dpng -r400 comando_discreto.png % para usuarios de Word
+print -depsc2 comando_discreto.eps % para usuarios de LaTeX

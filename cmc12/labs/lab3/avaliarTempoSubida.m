@@ -29,7 +29,8 @@ for i=1:length(trs)
     plot(out.wRoda.time, out.wRoda.signals.values, 'LineWidth', 2);
     legs{i} = sprintf('t_r=%.4f s', trs(i));
 end
-
+legend(legs, 'FontSize', 14, 'Location', 'Southeast');
+print -depsc2 ts.eps
 %% Tracando graficos das posicoes dos polos
 
 legend(legs, 'FontSize', 14, 'Location', 'Southeast');
@@ -48,3 +49,4 @@ for i=1:length(trs)
     legs{i} = sprintf('t_r=%.4f s', trs(i));
 end
 legend(legs, 'FontSize', 14, 'Location', 'Southwest');
+print -depsc2 polosts.eps

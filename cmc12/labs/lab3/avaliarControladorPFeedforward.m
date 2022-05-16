@@ -23,8 +23,8 @@ xlabel('Tempo (s)', 'FontSize', 14);
 ylabel('Velocidade do Motor (rad/s)', 'FontSize', 14);
 set(gca, 'FontSize', 14);
 grid on;
-print -dpng -r400 w_motor_pfeedforward.png % para usuarios de Word
-% print -depsc2 w_motor_pfeedforward.eps % para usuarios de LaTeX
+% print -dpng -r400 w_motor_pfeedforward.png % para usuarios de Word
+print -depsc2 w_motor_pfeedforward.eps % para usuarios de LaTeX
 
 figure;
 plot(out.wRoda.time, out.wRoda.signals.values, 'LineWidth', 2);
@@ -32,8 +32,8 @@ xlabel('Tempo (s)', 'FontSize', 14);
 ylabel('Velocidade da Roda (rad/s)', 'FontSize', 14);
 set(gca, 'FontSize', 14);
 grid on;
-print -dpng -r400 w_roda_pfeedforward.png % para usuarios de Word
-% print -depsc2 w_roda_pfeedforward.eps % para usuarios de LaTeX
+% print -dpng -r400 w_roda_pfeedforward.png % para usuarios de Word
+print -depsc2 w_roda_pfeedforward.eps % para usuarios de LaTeX
 
 figure;
 plot(out.V.time, out.V.signals.values, 'LineWidth', 2);
@@ -41,5 +41,5 @@ xlabel('Tempo (s)', 'FontSize', 14);
 ylabel('Comando (V)', 'FontSize', 14);
 set(gca, 'FontSize', 14);
 grid on;
-print -dpng -r400 comando_pfeedforward.png % para usuarios de Word
-% print -depsc2 comando_pfeedforward.eps % para usuarios de LaTeX
+% print -dpng -r400 comando_pfeedforward.png % para usuarios de Word
+print -depsc2 comando_pfeedforward.eps % para usuarios de LaTeX
