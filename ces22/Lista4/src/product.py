@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from src.taxCalculator import BookTaxCalculator
 
 class Product(ABC):
       def __init__(self):
@@ -22,9 +23,10 @@ class Book(Product):
           self.publisher = publisher
           self.sell_price = sell_price
           self.buy_price = buy_price
+          self.taxCalculator = BookTaxCalculator()
           
       def get_taxes(self):
-            pass
+            return self.taxCalculator.get_tax(self.genre, self.sell_price, self.buy_price)
 
       def get_title(self):
             return self.title
