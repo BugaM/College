@@ -4,9 +4,9 @@ store = Bookstore()
 
 while (True):
       print('\n\nChoose what you want to deal with:')
+      print('b    :     Books')
       print('c    :     Clients')
       print('o    :     Orders')
-      print('b    :     Books')
       print('\n\n press q to quit\n')
       sel = input()
       if sel == 'q':
@@ -36,6 +36,42 @@ while (True):
                         store.modify_client(cpf, attr, value)
                   elif sel == 'r':
                         store.remove_client(cpf)
+                        print('Client removed.')
+                  else:
+                        print('Unrecognized action')
+      
+      elif sel == 'b':
+            while (True):
+                  print('\n\nChoose what you want to do:\n')
+                  print('a    :     add book')
+                  print('c    :     check books by author')
+                  print('m    :     modify book')
+                  print('r    :     remove book')
+                  print('q    :     return to main page')
+                  sel = input('\n')
+                  if sel == 'q':
+                        break
+                  if sel == 'a':
+                        title = input('Book title:')
+                        author_name = input('Author name:')
+                        genre = input('Genre:')
+                        edition = input('Edition:')
+                        publisher = input('Publisher:')
+                        sell_price = input('Sell price:')
+                        buy_price = input('Buy price:')
+                        store.add_book(title, author_name, genre, edition, publisher, sell_price, buy_price)
+                        print('Book added.')
+                  elif sel == 'c':
+                        author_name = input('Author name:')
+                        store.check_author_books(author_name)
+                  elif sel == 'm':
+                        title = input('Book title:')
+                        attr = input('What information do you want to modify:')
+                        value = input('New information value:')
+                        store.modify_book(title, attr, value)
+                  elif sel == 'r':
+                        title = input('Book title:')
+                        store.remove_book(title)
                         print('Client removed.')
                   else:
                         print('Unrecognized action')

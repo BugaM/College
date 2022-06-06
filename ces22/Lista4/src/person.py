@@ -1,17 +1,15 @@
 from abc import ABC, abstractmethod
 
 class Person(ABC):
-      def __init__(self, cpf, name, email) -> None:
-          self.cpf = cpf
-          self.name = name
-          self.email = email
+      def __init__(self):
+          pass
 
       @abstractmethod
       def modify(self, attr, value):
             pass
 
-class Client():
-      def __init__(self, cpf, name, email) -> None:
+class Client(Person):
+      def __init__(self, cpf, name, email):
           self.cpf = cpf
           self.name = name
           self.email = email
@@ -30,3 +28,26 @@ class Client():
       def print_info(self):
             print('Name: ' + self.name)
             print('Email: ' + self.email)
+
+class Author(Person):
+      def __init__(self, name, email):
+          self.name = name
+          self.email = email
+          self.books = []
+
+      def add_book(self, book):
+            self.books.append(book)
+      
+      def get_name(self):
+            return self.name
+      
+      def get_books(self):
+            return self.books
+
+      def modify(self, attr, value):
+            if attr == 'name':
+                  self.name = value
+            elif attr == 'email':
+                  self.email = value
+            else:
+                  print('Unrecognized attribute')
