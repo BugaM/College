@@ -28,6 +28,8 @@ class Bookstore:
             self.authorManager.modify(self, name, attr, value)
       def remove_author(self, name):
             self.authorManager.remove(name)
+      def remove_book_from_author(self, author_name, title):
+            self.authorManager.remove_book_from_author(author_name, title)
 
       # Book methods
 
@@ -43,4 +45,5 @@ class Bookstore:
             self.bookManager.modify(book_title, attr, value)
       
       def remove_book(self, book_title):
-            self.bookManager.remove(book_title)
+            book = self.bookManager.remove(book_title)
+            self.remove_book_from_author(book.get_author(), book_title)

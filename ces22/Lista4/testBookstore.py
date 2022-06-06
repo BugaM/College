@@ -72,7 +72,7 @@ while (True):
                   elif sel == 'r':
                         title = input('Book title:')
                         store.remove_book(title)
-                        print('Client removed.')
+                        print('Book removed.')
                   else:
                         print('Unrecognized action')
 

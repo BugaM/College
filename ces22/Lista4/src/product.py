@@ -47,6 +47,9 @@ class Book(Product):
                   self.author = value
             else:
                   print('Unrecognized attribute')
+
+      def get_author(self):
+            return self.author
           
       
 

@@ -51,3 +51,8 @@ class Author(Person):
                   self.email = value
             else:
                   print('Unrecognized attribute')
+
+      def remove_book(self, title):
+            for book in self.books:
+                  if book.get_title() == title:
+                        self.books.remove(book)

@@ -68,7 +68,7 @@ class BookManager(Manager):
             for book in self.obj:
                 if book.get_title() == title:
                       self.obj.remove(book)
-                      return
+                      return book
             print('Book not found')
 
 class AuthorManager(Manager):
@@ -89,6 +89,9 @@ class AuthorManager(Manager):
       def get_author_books(self, author_name):
             for auth in self.obj:
                   if auth.get_name() == author_name:
+                        if len(auth.get_books()) == 0:
+                              print('No books available.')
+                              return
                         for book in auth.get_books():
                               print(book.get_title())
                         return
@@ -107,6 +110,12 @@ class AuthorManager(Manager):
                       self.obj.remove(auth)
                       return
             print('Author not found')
+      
+      def remove_book_from_author(self, author_name, book_title):
+            for auth in self.obj:
+                  if auth.get_name() == author_name:
+                        auth.remove_book(book_title)
+                        return
 
 class OrderManager(Manager):
       pass
