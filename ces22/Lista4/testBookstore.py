@@ -1,6 +1,6 @@
-from library import Library
+from src.bookstore import Bookstore
 
-lib= Library()
+store = Bookstore()
 
 while (True):
       print('\n\nChoose what you want to deal with:')
@@ -26,16 +26,16 @@ while (True):
                   if sel == 'a':
                         name = input('Client name:')
                         email = input('Client email:')
-                        lib.add_client(cpf, name, email)
+                        store.add_client(cpf, name, email)
                         print('Client added.')
                   elif sel == 'c':
-                        lib.check_client(cpf)
+                        store.check_client(cpf)
                   elif sel == 'm':
                         attr = input('What information do you want to modify (name or email):')
                         value = input('New information value:')
-                        lib.modify_client(cpf, attr, value)
+                        store.modify_client(cpf, attr, value)
                   elif sel == 'r':
-                        lib.remove_client(cpf)
+                        store.remove_client(cpf)
                         print('Client removed.')
                   else:
                         print('Unrecognized action')

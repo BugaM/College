@@ -1,6 +1,6 @@
 from manager import ClientManager, BookManager
 
-class Library:
+class Bookstore:
       def __init__(self):
            self.clientManager = ClientManager()
            self.bookManager = BookManager()
@@ -15,3 +15,4 @@ class Library:
       def remove_client(self, cpf):
             self.clientManager.remove(cpf)
       
+      # Book methods
