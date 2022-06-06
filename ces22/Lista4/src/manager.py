@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from src.order import BookOrder
 from src.product import Book
 from src.person import Author, Client
 
@@ -118,4 +119,27 @@ class AuthorManager(Manager):
                         return
 
 class OrderManager(Manager):
-      pass
+      def add(self, client_name, qtd, price):
+            order = BookOrder(client_name, qtd, price)
+            self.obj.append(order)
+
+      def get_info(self, client_name):
+            for order in self.obj:
+                if order.get_cl_name() == client_name:
+                      order.print_info()
+                      return
+            print('Order not found')
+
+      def modify(self, client_name, attr, value):
+            for order in self.obj:
+                  if order.get_cl_name() == client_name:
+                        order.modify(attr, value)
+                        return
+            print('Order not found')
+
+      def remove(self, client_name):
+            for order in self.obj:
+                  if order.get_cl_name() == client_name:
+                        self.obj.remove(order)
+                        return
+            print('Order not found')
