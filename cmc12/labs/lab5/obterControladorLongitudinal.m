@@ -1,0 +1,16 @@
+function controlador = obterControladorLongitudinal()
+% controlador = obterControladorLongitudinal() retorna uma struct com os
+% parametros do controlador longitudinal:
+% controlador.Kph: ganho proporcional do controlador de altitude.
+% controlador.Kph: ganho derivativo do controlador de altitude.
+% controlador.Kph: ganho proporcional do controlador de altitude.
+% controlador.Kdh: ganho proporcional do controlador de altitude.
+% controlador.a: parametro a do filtro usado no termo PD.
+
+% controlador.Kph = ...
+% controlador.Kdh = ...
+% controlador.Ktheta = ...
+% controlador.Kq = ...
+% controlador.a = ...
+
+end
