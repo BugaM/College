@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <SubsetSumSolverAbstract.h>
 
 
@@ -16,7 +17,13 @@ public:
                         long value, std::vector< char> &output);
         
     virtual std::string getName() { return "A2"; }
-    
+
+    class Set;
+
+    static void bruteForce(const std::vector< long> &input, std::vector<Set> &subsets,
+                    Set &found, long value);
+
+
 }; 
 
 class SSPSolverExtra : public SubsetSumSolverAbstract {
@@ -39,7 +46,7 @@ public:
                         long value, std::vector< char> &output);
     
     virtual std::string getName() { return "PD"; }
-    
+
 }; 
 
 #endif
