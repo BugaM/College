@@ -16,10 +16,31 @@ class AbstractCakeFactory(ABC):
             '''Creates chocolate cake of a factory.'''
 
 class BirthdayCakeFactory(AbstractCakeFactory):
-      def __init__(self, flavor) -> None:
+      def __init__(self) -> None:
           super().__init__()
-          self.flavor = flavor
           self.style = 'birthday'
+      def createChocolateCake(self):
+          return Cake(self.style, 'chocolate')
+      def createCarrotCake(self):
+          return Cake(self.style, 'carrot')
+      def createManiocCake(self):
+          return Cake(self.style, 'manioc')
+
+class WeddingCakeFactory(AbstractCakeFactory):
+      def __init__(self) -> None:
+          super().__init__()
+          self.style = 'wedding'
+      def createChocolateCake(self):
+          return Cake(self.style, 'chocolate')
+      def createCarrotCake(self):
+          return Cake(self.style, 'carrot')
+      def createManiocCake(self):
+          return Cake(self.style, 'manioc')
+
+class InformalCakeFactory(AbstractCakeFactory):
+      def __init__(self) -> None:
+          super().__init__()
+          self.style = 'informal'
       def createChocolateCake(self):
           return Cake(self.style, 'chocolate')
       def createCarrotCake(self):
