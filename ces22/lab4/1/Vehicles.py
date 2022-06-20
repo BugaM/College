@@ -1,4 +1,4 @@
-from abc import ABC, abstractclassmethod, abstractmethod
+from abc import ABC, abstractmethod
 
 
 class Vehicle(ABC):
@@ -7,6 +7,7 @@ class Vehicle(ABC):
           self.engine = engine
 
       def accelerate(self):
+            print('Accelerating...')
             self.speed += self.engine.accelerate(self.mass)
       def stop(self):
             self.speed = 0
@@ -25,21 +26,21 @@ class Truck(Vehicle):
       def __init__(self, engine):
           super().__init__(engine)
           self.mass = 5000
-      def print_type():
+      def print_type(self):
           print('Truck')
 
 class Car(Vehicle):
       def __init__(self, engine):
           super().__init__(engine)
           self.mass = 1000
-      def print_type():
+      def print_type(self):
           print('Car')
 
 class Motorcycle(Vehicle):
       def __init__(self, engine):
           super().__init__(engine)
           self.mass = 100
-      def print_type():
+      def print_type(self):
           print('Motorcycle')
 
 

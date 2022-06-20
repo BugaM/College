@@ -20,22 +20,22 @@ class CarFactory(AbstractVehicleFactory):
       def create_eletric_engine_vehicle():
             return Car(EletricEngine())
       def create_combustion_engine_vehicle():
-           return Car(CombustionEngine)
+           return Car(CombustionEngine())
       def create_hybrid_engine_vehicle():
-            return Car(HybridEngine)
+            return Car(HybridEngine())
 
 class TruckFactory(AbstractVehicleFactory):
       def create_eletric_engine_vehicle():
             return Truck(EletricEngine())
       def create_combustion_engine_vehicle():
-           return Truck(CombustionEngine)
+           return Truck(CombustionEngine())
       def create_hybrid_engine_vehicle():
-            return Truck(HybridEngine)
+            return Truck(HybridEngine())
 
 class MotorcycleFactory(AbstractVehicleFactory):
       def create_eletric_engine_vehicle():
             return Motorcycle(EletricEngine())
       def create_combustion_engine_vehicle():
-           return Motorcycle(CombustionEngine)
+           return Motorcycle(CombustionEngine())
       def create_hybrid_engine_vehicle():
-            return Motorcycle(HybridEngine)
+            return Motorcycle(HybridEngine())
