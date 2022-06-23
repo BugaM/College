@@ -1,0 +1,10 @@
+#!/bin/bash
+FDATE=`date +'%y%m%d_%H%M'`
+
+zip -r /tmp/labTSP${FDATE}.zip * -x srcok\* -x build\*
+
+zip -r /tmp/labTSP_FULL${FDATE}.zip * -x build\*
+
+
+
+
