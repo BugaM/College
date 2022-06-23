@@ -7,7 +7,12 @@ struct TspSolver::Vert{
 
 struct TspSolver::CompDist{
     bool operator()(const Vert& a, const Vert& b){
-        return a.dist > b.dist;
+        if (a.dist != b.dist)
+            return a.dist > b.dist;
+        else if (a.to != b.to){
+            return a.to > b.to;
+        }
+        else return a.index > b.index;
     }
 };
 
@@ -44,7 +49,7 @@ void TspSolver::solve(TspReader &tr,std::vector<int> &percourse) {
         std::priority_queue<Vert, std::vector<Vert>, CompDist> heap;
         std::vector<bool> aux; // aux represents witch vertices are in heap
         aux.resize(n, true);
-        Vert top{};
+        Vert top{}, vertAux{};
 
         // Prim
         int curr = 0;
@@ -64,7 +69,7 @@ void TspSolver::solve(TspReader &tr,std::vector<int> &percourse) {
             tree[top.index].push_back(top.to);
             curr = top.index;
         }
-        
+
         // pre order tree transversal
         aux[curr] = false; //  aux now represents witch vertices have been visited in transversal
         visit(tree, percourse, aux, 0);
