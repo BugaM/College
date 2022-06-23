@@ -28,11 +28,10 @@ void TspSolver::visit(std::vector<std::vector<int>> &tree, std::vector<int> &per
 
 
 void TspSolver::solve(TspReader &tr,std::vector<int> &percourse) {
-        // here it is filling the vector with  1,2,3,...n
-        // you should fill it with a permutation that represents the TSP solution
         int n = tr.getNumCities();
         std::vector<City> vc;
         tr.copyCitiesVector(vc);
+
         // creating the graph - adj graph
         std::vector<std::vector<int>> graph;
         graph.resize(n, std::vector<int>(n));
@@ -41,15 +40,15 @@ void TspSolver::solve(TspReader &tr,std::vector<int> &percourse) {
                 graph[i][j] = vc[i].disti(vc[j]);
             }
         }
-
+        // creating the tree
         std::vector<std::vector<int>> tree;
         tree.resize(n);
 
 
         std::priority_queue<Vert, std::vector<Vert>, CompDist> heap;
-        std::vector<bool> aux; // aux represents witch vertices are in heap
+        std::vector<bool> aux; // aux represents which vertices are in heap
         aux.resize(n, true);
-        Vert top{}, vertAux{};
+        Vert top{};
 
         // Prim
         int curr = 0;
@@ -71,7 +70,7 @@ void TspSolver::solve(TspReader &tr,std::vector<int> &percourse) {
         }
 
         // pre order tree transversal
-        aux[curr] = false; //  aux now represents witch vertices have been visited in transversal
+        aux[curr] = false; //  aux now represents witch vertices have been visited in transversal - all vertices are false
         visit(tree, percourse, aux, 0);
 }//solve
 
