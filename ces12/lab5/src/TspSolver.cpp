@@ -42,32 +42,31 @@ void TspSolver::solve(TspReader &tr,std::vector<int> &percourse) {
 
 
         std::priority_queue<Vert, std::vector<Vert>, CompDist> heap;
-        std::vector<bool> inHeap;
-        inHeap.resize(n, true);
+        std::vector<bool> aux; // aux represents witch vertices are in heap
+        aux.resize(n, true);
         Vert top{};
 
         // Prim
         int curr = 0;
         for (int i = 0; i < n-1; i++) {
-            inHeap[curr] = false;
+            aux[curr] = false;
             for (int j = 0; j < n; j++) {
-                if (inHeap[j])
+                if (aux[j])
                     heap.push(Vert{j, curr,graph[curr][j]});
             }
             do {
                 top = heap.top();
                 heap.pop();
-            } while (not inHeap[top.index]);
+            } while (not aux[top.index]);
 
             // building tree with indexes
             tree[top.to].push_back(top.index);
             tree[top.index].push_back(top.to);
             curr = top.index;
         }
-        inHeap[curr] = false;
-
-        auto visited = inHeap;
+        
         // pre order tree transversal
-        visit(tree, percourse, visited, 0);
+        aux[curr] = false; //  aux now represents witch vertices have been visited in transversal
+        visit(tree, percourse, aux, 0);
 }//solve
 
