@@ -16,5 +16,5 @@ a = 4 + 4*xi*wn*T + T^2*wn^2;
 b = 2*T^2*wn^2 - 8;
 c = 4 - 4*xi*wn*T + T^2*wn^2;
 
-u = -b/a*ua -c/a* uaa + T^2*wn^2*(e + 2*ea + eaa);
+u = -b/a*ua -c/a* uaa + T^2*wn^2/a*(e + 2*ea + eaa);
 end

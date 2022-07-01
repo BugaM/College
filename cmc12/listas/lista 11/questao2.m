@@ -5,6 +5,6 @@ function [alpha, T] = questao2()
 roots([1 0 13 0 -2880]);
 wcp = 6.896219;
 T = 10/wcp;
-alpha = 81/5;
+alpha = 19/9;
 
 end
