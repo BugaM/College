@@ -65,7 +65,7 @@ class BalanceCommand(Command):
 
       def execute(self):
           self.gui.current_op['text'] = 'Saldo:'
-          value = self.account.balance
+          value = self.account.money
           self.gui.operation_history += 'Saldo checado - total {} : {}\n'.format(value, self.gui.get_current_datetime())
           self.gui.data['text'] = self.account.money
 
