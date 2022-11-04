@@ -155,3 +155,7 @@ dmypy.json
 *.slxc
 slprj/
 *.r2020b
+
+
+#CSV
+*.csv
