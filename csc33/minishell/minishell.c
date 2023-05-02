@@ -4,6 +4,8 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+
 
 #define MAX 200
 
@@ -40,12 +42,24 @@ void parse_get_args(char *args []){
       args[i] = NULL;
 }
 
+int valid_cmd(char* prog){
+      if (prog == NULL){
+            return 0;
+      }
+      if (strcmp(prog, "exit") == 0)
+            exit(0);
+      if (prog[0] != '.' && prog[0] != '/'){
+            return 0;
+      }
+      return 1;
+}
 
 int main(){
 
       for(;;) {
             int id;
-
+            int in_fd;
+            int out_fd;
 
             char cmd [MAX];
             char cmdIn [MAX];
@@ -67,41 +81,32 @@ int main(){
             in = parse_get_in(cmdIn);
             out = parse_get_out(cmdOut);
 
-            if (strcmp(prog, "exit") == 0)
-                  exit(0);
             
+            if (!valid_cmd(prog))
+                  continue;
+
             id = fork();
 
             if (id != 0){
                   wait(NULL);
             }
             else{
+                  if (in){
+                        in_fd = open(in, O_RDONLY);
+                        dup2(in_fd, STDIN_FILENO);
+                        close(in_fd);
+                  }
                   if(out){
-                        int fd = open(out,"w");
-                        dup2(fd, STDOUT_FILENO);
+                        out_fd = open(out, O_CREAT | O_WRONLY, 0666);
+                        dup2(out_fd, STDOUT_FILENO);
+                        close(out_fd);
                   }
                   execv(prog, args);
                   exit(0);
             }
 
         }
-            // if (malformed cmd) {
-            //       continue
-            // }
-
-            // if (prog == 'exit') {
-            //       break
-            // }
-
-            // parent = fork()
-
-            // if (parent) {
-            //       wait()
-            // } else {
-            //       redirect(in)
-            //       redirect(out)
-            //       exec(prog, args)
-            // }
+      
       return 0;
 }
 
