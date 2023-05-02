@@ -1,5 +1,9 @@
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 #define MAX 200
 
@@ -8,50 +12,79 @@ void read_command(char str []){
 }
 
 char* parse_get_program(char *cmd){
-      return strtok(cmd, " "); 
+      return strtok(cmd, " \n"); 
 }
 
-char* parse_get_in (){
-      return strtok(NULL, "< "); 
+char* parse_get_in (char *cmd){
+      strtok(cmd, "<");
+      return strtok(NULL, " \n"); 
 }
 
-char* parse_get_out (){
-      return strtok(NULL, "> "); 
+char* parse_get_out (char *cmd){
+      strtok(cmd, ">");
+      return strtok(NULL, " \n"); 
 }
 
 void parse_get_args(char *args []){
       char *curr;
-      int i = 0;
-      curr = strtok(NULL , " ");
+      int i = 1;
+      curr = strtok(NULL , " \n");
       while (curr != NULL){
+            if (strcmp(curr, "<") == 0 || strcmp(curr, ">") == 0){
+                  break;
+            }
             args[i] = curr;
-            curr = strtok(NULL , " ");
+            curr = strtok(NULL , " \n");
             i++;
       }
+      args[i] = NULL;
 }
 
 
 int main(){
 
       for(;;) {
+            int id;
+
+
             char cmd [MAX];
+            char cmdIn [MAX];
+            char cmdOut [MAX];
             char *prog;
             char *in;
             char *out;
             char *args [MAX];
+
+
             read_command(cmd);
+            strcpy(cmdIn,cmd);
+            strcpy(cmdOut,cmd);
+
             prog = parse_get_program(cmd);
-            printf("%s \n", prog);
-            in = parse_get_in();
-            printf("%s\n", in);
-            out = parse_get_out();
-            printf("%s\n", out);
+            args[0] = prog;
             parse_get_args(args);
-            printf("%s%s\n", args[0], args[1]);
 
-            // in = parse_get_stdin(cmd);
-            // out = parse_get_stdout(cmd)
+            in = parse_get_in(cmdIn);
+            out = parse_get_out(cmdOut);
 
+            if (strcmp(prog, "exit") == 0)
+                  exit(0);
+            
+            id = fork();
+
+            if (id != 0){
+                  wait(NULL);
+            }
+            else{
+                  if(out){
+                        int fd = open(out,"w");
+                        dup2(fd, STDOUT_FILENO);
+                  }
+                  execv(prog, args);
+                  exit(0);
+            }
+
+        }
             // if (malformed cmd) {
             //       continue
             // }
@@ -69,7 +102,6 @@ int main(){
             //       redirect(out)
             //       exec(prog, args)
             // }
-      }
       return 0;
 }
 
