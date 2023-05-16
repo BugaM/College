@@ -31,6 +31,11 @@ char* parse_get_out (char *cmd){
       return strtok(NULL, " \n"); 
 }
 
+char* parse_get_pipe (char *cmd){
+      strtok(cmd, "|");
+      return strtok(NULL, " \n"); 
+}
+
 // Tokenize program arguments of input
 void parse_get_args(char *args []){
       char *curr;
@@ -38,7 +43,7 @@ void parse_get_args(char *args []){
       curr = strtok(NULL , " \n");
       while (curr != NULL){
             // get arguments untill redirections
-            if (strcmp(curr, "<") == 0 || strcmp(curr, ">") == 0){
+            if (strcmp(curr, "<") == 0 || strcmp(curr, ">") == 0 || strcmp(curr, "|") == 0){
                   break;
             }
             args[i] = curr;
@@ -85,13 +90,17 @@ int main(){
       char cmd [MAX];
       char cmdIn [MAX];
       char cmdOut [MAX];
+      char cmdPipe [MAX];
 
       // tokenized parts of cmd
       char *prog;
       char *in;
       char *out;
+      char *pipe_prog;
       char *args [MAX];
+      char *args_pipe [MAX];
 
+      int pipe_fd [2];
 
       print_starting_message();
 
@@ -101,6 +110,7 @@ int main(){
             read_command(cmd);
             strcpy(cmdIn,cmd);
             strcpy(cmdOut,cmd);
+            strcpy(cmdPipe,cmd);
 
             prog = parse_get_program(cmd);
             // add prog as first argument
@@ -109,6 +119,9 @@ int main(){
 
             in = parse_get_in(cmdIn);
             out = parse_get_out(cmdOut);
+            pipe_prog = parse_get_pipe(cmdPipe);
+            args_pipe[0] = pipe_prog;
+            parse_get_args(args_pipe);
 
             
             if (!valid_cmd(prog))
@@ -138,8 +151,27 @@ int main(){
                         dup2(out_fd, STDOUT_FILENO);
                         close(out_fd);
                   }
-                  execv(prog, args);
-                  exit(0);
+                  if (pipe_prog){
+                        pipe(pipe_fd);
+                        id = fork();
+                        if (id == 0){ // child
+                              close(pipe_fd[0]);
+                              dup2(pipe_fd[1], STDOUT_FILENO);
+                              execv(prog, args);
+                              exit(0);
+                        }
+                        else{
+                              wait(NULL);
+                              close(pipe_fd[1]);
+                              dup2(pipe_fd[0], STDIN_FILENO);
+                              execv(pipe_prog, args_pipe);
+                        }
+
+                  }
+                  else{
+                        execv(prog, args);
+                        exit(0);
+                  }
             }
         }
 
