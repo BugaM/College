@@ -54,6 +54,42 @@ void parse_get_args(char *args []){
       args[i] = NULL;
 }
 
+void parse_get_pipe_args(char *args [][MAX], int current){
+      char *curr;
+      int i = 1;
+      curr = strtok(NULL , " \n");
+      while (curr != NULL){
+            // get arguments untill redirections
+            if (strcmp(curr, "<") == 0 || strcmp(curr, ">") == 0 || strcmp(curr, "|") == 0){
+                  break;
+            }
+            args[current][i] = curr;
+            curr = strtok(NULL , " \n");
+            i++;
+      }
+      // last element must be NULL
+      args[current][i] = NULL;
+}
+
+void parse_pipe(char *cmd, char *pipe_progs [], char *args_pipe[][MAX]){
+      char *curr;
+      int i = 0;
+      curr = parse_get_pipe(cmd);
+      while (curr != NULL){
+            // get arguments untill redirections
+            if (strcmp(curr, "<") == 0 || strcmp(curr, ">") == 0 || strcmp(curr, "|") == 0){
+                  break;
+            }
+            pipe_progs[i] = curr;
+            parse_get_pipe_args(args_pipe, i);
+            args_pipe[i][0] = curr;
+            curr = strtok(NULL , " \n");
+            i++;
+      }
+      // last element must be NULL
+      pipe_progs[i] = NULL;
+}
+
 // Check if valid program
 int valid_cmd(char* prog){
       if (prog == NULL){
@@ -96,9 +132,9 @@ int main(){
       char *prog;
       char *in;
       char *out;
-      char *pipe_prog;
+      char *pipe_progs[MAX];
       char *args [MAX];
-      char *args_pipe [MAX];
+      char *args_pipe [MAX][MAX];
 
       int pipe_fd [2];
 
@@ -119,9 +155,7 @@ int main(){
 
             in = parse_get_in(cmdIn);
             out = parse_get_out(cmdOut);
-            pipe_prog = parse_get_pipe(cmdPipe);
-            args_pipe[0] = pipe_prog;
-            parse_get_args(args_pipe);
+            parse_pipe(cmdPipe, pipe_progs, args_pipe);
 
             
             if (!valid_cmd(prog))
@@ -151,21 +185,21 @@ int main(){
                         dup2(out_fd, STDOUT_FILENO);
                         close(out_fd);
                   }
-                  if (pipe_prog){
-                        pipe(pipe_fd);
-                        id = fork();
-                        if (id == 0){ // child
-                              close(pipe_fd[0]);
-                              dup2(pipe_fd[1], STDOUT_FILENO);
-                              execv(prog, args);
-                              exit(0);
-                        }
-                        else{
-                              wait(NULL);
-                              close(pipe_fd[1]);
-                              dup2(pipe_fd[0], STDIN_FILENO);
-                              execv(pipe_prog, args_pipe);
-                        }
+                  if (pipe_progs[0]){
+                        // pipe(pipe_fd);
+                        // id = fork();
+                        // if (id == 0){ // child
+                        //       close(pipe_fd[0]);
+                        //       dup2(pipe_fd[1], STDOUT_FILENO);
+                        //       execv(prog, args);
+                        //       exit(0);
+                        // }
+                        // else{
+                        //       wait(NULL);
+                        //       close(pipe_fd[1]);
+                        //       dup2(pipe_fd[0], STDIN_FILENO);
+                        //       execv(pipe_prog, args_pipe);
+                        // }
 
                   }
                   else{
