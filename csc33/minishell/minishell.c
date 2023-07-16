@@ -71,7 +71,7 @@ void parse_get_pipe_args(char *args [][MAX], int current){
       args[current][i] = NULL;
 }
 
-void parse_pipe(char *cmd, char *pipe_progs [], char *args_pipe[][MAX]){
+int parse_pipe(char *cmd, char *pipe_progs [], char *args_pipe[][MAX]){
       char *curr;
       int i = 0;
       curr = parse_get_pipe(cmd);
@@ -88,7 +88,9 @@ void parse_pipe(char *cmd, char *pipe_progs [], char *args_pipe[][MAX]){
       }
       // last element must be NULL
       pipe_progs[i] = NULL;
+      return i - 1;
 }
+
 
 // Check if valid program
 int valid_cmd(char* prog){
@@ -136,7 +138,8 @@ int main(){
       char *args [MAX];
       char *args_pipe [MAX][MAX];
 
-      int pipe_fd [2];
+      int pipe_fd [MAX];
+      int pipe_number;
 
       print_starting_message();
 
@@ -155,7 +158,7 @@ int main(){
 
             in = parse_get_in(cmdIn);
             out = parse_get_out(cmdOut);
-            parse_pipe(cmdPipe, pipe_progs, args_pipe);
+            pipe_number = parse_pipe(cmdPipe, pipe_progs, args_pipe);
 
             
             if (!valid_cmd(prog))
@@ -185,22 +188,34 @@ int main(){
                         dup2(out_fd, STDOUT_FILENO);
                         close(out_fd);
                   }
+                  int i;
                   if (pipe_progs[0]){
-                        // pipe(pipe_fd);
-                        // id = fork();
-                        // if (id == 0){ // child
-                        //       close(pipe_fd[0]);
-                        //       dup2(pipe_fd[1], STDOUT_FILENO);
-                        //       execv(prog, args);
-                        //       exit(0);
-                        // }
-                        // else{
-                        //       wait(NULL);
-                        //       close(pipe_fd[1]);
-                        //       dup2(pipe_fd[0], STDIN_FILENO);
-                        //       execv(pipe_prog, args_pipe);
-                        // }
+                        pipe(pipe_fd);
+                        id = fork();
+                        if (id == 0){ // child
+                              dup2(pipe_fd[1], STDOUT_FILENO);
+                              // close(pipe_fd[0]);
+                              execv(prog, args);
+                              exit(0);
+                        }
+                        dup2(pipe_fd[0], 0);
+                        close(pipe_fd[1]);
+                        for(i=0; i< pipe_number; i++)
+                        {
+                              pipe(pipe_fd);
+                              id = fork();
+                              if (id == 0) {
+                                    dup2(pipe_fd[1], STDOUT_FILENO); // remap output back to parent
+                                    execv(pipe_progs[i], args_pipe[i]);
+                                    exit(0);
+                              }
 
+                              // remap output from previous child to input
+                              dup2(pipe_fd[0], STDIN_FILENO);
+                              close(pipe_fd[1]);
+                        }
+                        execv(pipe_progs[i], args_pipe[i]);
+                        exit(0);
                   }
                   else{
                         execv(prog, args);
