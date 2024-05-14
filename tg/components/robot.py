@@ -10,11 +10,11 @@ class Robot (ABC):
         self.r = r
         self.l = l
         self.pos = pos
-        self.phi = 0
+        self.psi = 0
         self.v = np.array([0,0,0]).T
     def move(self):
         self.pos = self.pos + self.v[:2]
-        self.phi = Robot.constrain_angle(self.phi + self.v[2])
+        self.psi = Robot.constrain_angle(self.psi + self.v[2])
     def update(self):
         self._set_wheel_speeds(self.decision.get_decision())
         self.move()
@@ -35,10 +35,10 @@ class Robot (ABC):
         return np.arctan2(self.pos[1], self.pos[0])
     @property
     def R(self):
-        theta = self.theta
+        psi = self.psi
         return np.array([
-                        [np.cos(theta), -np.sin(theta)],
-                        [ np.sin(theta), np.cos(theta)]
+                        [np.cos(psi), -np.sin(psi)],
+                        [ np.sin(psi), np.cos(psi)]
         ]).reshape(2,2)
 
 class SSLRobot(Robot):

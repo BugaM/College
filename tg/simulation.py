@@ -13,7 +13,7 @@ class Simulation:
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
-        self.player = SSLRobot(ConstantDecision(np.array([[0.01,0,-0.01,0]]).T),np.array([PLAYER_START_POS]).T, WHEEL_RADIUS, WHEEL_LENGTH)
+        self.player = SSLRobot(ConstantDecision(np.array([[0,-0.1,0.1,0]]).T),np.array([PLAYER_START_POS]).T, WHEEL_RADIUS, WHEEL_LENGTH)
         self.ball = Ball(np.array([BALL_START_POS]).T)
         self.goals = [pygame.Rect(p[0], p[1], GOAL_LENGTH, GOAL_WIDTH) for p in GOAL_POSITIONS]
         self.invert_iter= 0
@@ -33,12 +33,11 @@ class Simulation:
         abs_v = norm(ball.v[:2])
         if self.invert_iter > MAX_INVERT_ITERATIONS:
             if ball.pos[0] <= BALL_RADIUS or ball.pos[0] >= WIDTH - BALL_RADIUS:
-                invert_iter = 0
+                self.invert_iter = 0
                 ball.v[0] *= -1
             if ball.pos[1] <= BALL_RADIUS or ball.pos[1] >= HEIGHT - BALL_RADIUS:
-                invert_iter = 0
+                self.invert_iter = 0
                 ball.v[1] *= -1  
-            self.invert_iter = 0
         
         if abs_v - FRICTION > 0:
             ball.v[:2] = (abs_v - FRICTION) * ball.v[:2]/abs_v
@@ -65,7 +64,9 @@ class Simulation:
 
     def draw(self):
         self.screen.fill(FIELD_COLOR)
+        player_front = self.player.pos + PLAYER_RADIUS/2 * np.array([np.cos(self.player.psi),np.sin(self.player.psi)])
         pygame.draw.circle(self.screen, PLAYER_COLOR, self.player.pos.reshape(2), PLAYER_RADIUS)
+        pygame.draw.circle(self.screen, BALL_COLOR, player_front.reshape(2), PLAYER_RADIUS/8)
         pygame.draw.circle(self.screen, BALL_COLOR, self.ball.pos.reshape(2), BALL_RADIUS)
         for goal in self.goals:
             pygame.draw.rect(self.screen, GOAL_COLOR, goal)
