@@ -1,42 +1,25 @@
+
+from simulation import Simulation
+from constants.field_constants import  ACCELERATED_STEPS
 import pygame
 import sys
-from simulation import *
 
-ACCELERATED = True
-# ACCELERATED = False
-
-
-def draw():
-    screen.fill(FIELD_COLOR)
-    pygame.draw.circle(screen, PLAYER_COLOR, player_pos, PLAYER_RADIUS)
-    pygame.draw.circle(screen, BALL_COLOR, ball_pos, BALL_RADIUS)
-    for goal in goals:
-        pygame.draw.rect(screen, GOAL_COLOR, goal)
-    pygame.display.flip()
-
-# Main game loop
-running = True
-steps = 1
-# Initialize Pygame
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
+# ACCELERATED = True
+ACCELERATED = False
 if ACCELERATED:
     steps = ACCELERATED_STEPS
+else:
+    steps = 1
+
+simulation = Simulation()
+running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    keys = pygame.key.get_pressed()
-    for i in range(steps):
-        update_player(keys)
-        update_ball()
-        check_goal()
-        check_collision()
-    draw()
-
-    clock.tick(60)
+    # keys = pygame.key.get_pressed()
+    simulation.run(steps)
 
 pygame.quit()
 sys.exit()

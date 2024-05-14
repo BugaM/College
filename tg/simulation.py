@@ -1,88 +1,72 @@
 import pygame
 import math
+from numpy.linalg import norm
+import numpy as np
 from constants.field_constants import *
+from constants.robot_constants import *
+from components.robot import SSLRobot
+from decision_making.decision import ConstantDecision
+from components.ball import Ball
 
+class Simulation:
+    def __init__(self) -> None:
+        pygame.init()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.clock = pygame.time.Clock()
+        self.player = SSLRobot(ConstantDecision(np.array([[0.01,0,-0.01,0]]).T),np.array([PLAYER_START_POS]).T, WHEEL_RADIUS, WHEEL_LENGTH)
+        self.ball = Ball(np.array([BALL_START_POS]).T)
+        self.goals = [pygame.Rect(p[0], p[1], GOAL_LENGTH, GOAL_WIDTH) for p in GOAL_POSITIONS]
+        self.invert_iter= 0
 
-# Player
-player_pos = [WIDTH // 2 - 3* PLAYER_RADIUS, HEIGHT // 2 ]
-player_velocity = [0, 0]
+    def run(self, steps):
+        for _ in range(steps):
+            self.update_player()
+            self.update_ball()
+            self.check_goal()
+            self.check_collision()
+        self.draw()
 
-# Ball
-ball_pos = [WIDTH // 2, HEIGHT // 2]
-ball_velocity = [1, 1]  # [x, y]
-ball_speed = 0
-invert_iter = 0
-# Goals
-goals = [pygame.Rect(pos[0], pos[1], GOAL_LENGTH, GOAL_WIDTH) for pos in GOAL_POSITIONS]
+    def update_ball(self):
+        self.invert_iter += 1
+        # Simple collision with walls
+        ball = self.ball
+        abs_v = norm(ball.v[:2])
+        if self.invert_iter > MAX_INVERT_ITERATIONS:
+            if ball.pos[0] <= BALL_RADIUS or ball.pos[0] >= WIDTH - BALL_RADIUS:
+                invert_iter = 0
+                ball.v[0] *= -1
+            if ball.pos[1] <= BALL_RADIUS or ball.pos[1] >= HEIGHT - BALL_RADIUS:
+                invert_iter = 0
+                ball.v[1] *= -1  
+            self.invert_iter = 0
+        
+        if abs_v - FRICTION > 0:
+            ball.v[:2] = (abs_v - FRICTION) * ball.v[:2]/abs_v
+        else: 
+            ball.v[:2] *= 0
+        ball.move()
 
-def update_ball():
-    global ball_pos, ball_speed, invert_iter
+    def update_player(self):
+        self.player.update()
 
-    invert_iter += 1
-    # Simple collision with walls
-    if invert_iter > MAX_INVERT_ITERATIONS:
-        if ball_pos[0] <= BALL_RADIUS or ball_pos[0] >= WIDTH - BALL_RADIUS:
-            invert_iter = 0
-            ball_velocity[0] *= -1
-        if ball_pos[1] <= BALL_RADIUS or ball_pos[1] >= HEIGHT - BALL_RADIUS:
-            invert_iter = 0
-            ball_velocity[1] *= -1    
-    if ball_speed - FRICTION > 0:
-        ball_speed -= FRICTION
-    else: ball_speed = 0
-    ball_pos[0] += ball_velocity[0] * ball_speed
-    ball_pos[1] += ball_velocity[1] * ball_speed
+    def check_goal(self):
+        for goal in self.goals:
+            if goal.collidepoint(self.ball.pos.reshape(2)):
+                self.ball.reset_ball()
 
-def update_player(keys):
-    global player_pos, player_velocity
+    def check_collision(self):
+        player_pos = self.player.pos
+        ball_pos = self.ball.pos
+        dist = math.dist(player_pos, ball_pos)
 
+        if dist <= PLAYER_RADIUS + BALL_RADIUS:
+            # Calculate velocities before collision
+            self.ball.v += self.player.v[:2]
 
-    if keys[pygame.K_w]:
-        player_velocity[1] = -PLAYER_SPEED
-    if keys[pygame.K_s]:
-        player_velocity[1] = PLAYER_SPEED
-    if keys[pygame.K_a]:
-        player_velocity[0] = -PLAYER_SPEED
-    if keys[pygame.K_d]:
-        player_velocity[0] = PLAYER_SPEED
-    if keys[pygame.K_SPACE]:
-        player_velocity = [0,0]
-    
-    if player_pos[0] <= PLAYER_RADIUS or player_pos[0] >= WIDTH - PLAYER_RADIUS:
-        player_velocity[0] *= -1
-    if player_pos[1] <= PLAYER_RADIUS or player_pos[1] >= HEIGHT - PLAYER_RADIUS:
-        player_velocity[1] *= -1
-
-    player_pos[0] += player_velocity[0]
-    player_pos[1] += player_velocity[1]
-
-def check_goal():
-    for goal in goals:
-        if goal.collidepoint(ball_pos[0], ball_pos[1]):
-            reset_ball()
-
-def check_collision():
-    global ball_speed
-    dist = math.dist(player_pos, ball_pos)
-
-
-    if dist <= PLAYER_RADIUS + BALL_RADIUS:
-        # Calculate velocities before collision
-        v1_before = math.sqrt(player_velocity[0]**2 + player_velocity[1]**2)
-        theta1_before = math.atan2(player_velocity[1], player_velocity[0])
-        v2_before = math.sqrt(ball_velocity[0]**2 + ball_velocity[1]**2)
-        theta2_before = math.atan2(ball_velocity[1], ball_velocity[0])
-
-        # Calculate velocities after collision (elastic collision)
-        v2_after = v1_before
-        theta2_after = theta1_before
-        ball_speed = v2_after
-
-        # Update velocities
-        ball_velocity[0] = v2_after * math.cos(theta2_after)
-        ball_velocity[1] = v2_after * math.sin(theta2_after)
-
-def reset_ball():
-    global ball_pos, ball_velocity
-    ball_pos = [WIDTH // 2 - BALL_RADIUS // 2, HEIGHT // 2 - BALL_RADIUS // 2]
-    ball_velocity = [1, 1]
+    def draw(self):
+        self.screen.fill(FIELD_COLOR)
+        pygame.draw.circle(self.screen, PLAYER_COLOR, self.player.pos.reshape(2), PLAYER_RADIUS)
+        pygame.draw.circle(self.screen, BALL_COLOR, self.ball.pos.reshape(2), BALL_RADIUS)
+        for goal in self.goals:
+            pygame.draw.rect(self.screen, GOAL_COLOR, goal)
+        pygame.display.flip()
