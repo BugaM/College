@@ -10,13 +10,17 @@ from decision_making.decision import ConstantDecision
 class Simulation:
     def __init__(self) -> None:
         pygame.init()
+        self.path = []
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
-        self.player = SSLRobot(ConstantDecision(np.array([[0,-1,1,0]]).T),np.array([PLAYER_START_POS]).T, WHEEL_RADIUS, WHEEL_LENGTH)
+        decision = ConstantDecision(np.array([[0.01,-0.01,-0.04,0.3]]).T)
+        self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, WHEEL_RADIUS, WHEEL_LENGTH)
 
-    def run(self, steps):
+    def run(self, steps, draw_path):
         for _ in range(steps):
             self.update_player()
+            if draw_path:
+                self.path.append(self.player.pos.reshape(2))
             self.check_collision()
         self.draw()
 
@@ -41,11 +45,16 @@ class Simulation:
         pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN - GOAL_DEPTH, (HEIGHT // 2) - (GOAL_WIDTH // 2), GOAL_DEPTH, GOAL_WIDTH), LINE_WIDTH)
         pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(WIDTH - BOUNDARY_MARGIN, (HEIGHT // 2) - (GOAL_WIDTH // 2), GOAL_DEPTH, GOAL_WIDTH), LINE_WIDTH)
 
+    def draw_path(self):
+        # Draw the path given a list of positions
+        if len(self.path) > 1:
+            pygame.draw.lines(self.screen, PATH_COLOR, False, self.path, LINE_WIDTH)
 
 
     def draw(self):
         self.screen.fill(FIELD_COLOR)
         self.draw_field()
+        self.draw_path()
 
 
         player_front = self.player.pos + PLAYER_RADIUS/2 * np.array([np.cos(self.player.psi),np.sin(self.player.psi)])

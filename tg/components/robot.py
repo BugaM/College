@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from components.controllers import SSLController
 from decision_making.decision import Decision
+from constants.robot_constants import MAX_WHEEL_SPEED
 import numpy as np
 
 class Robot (ABC):
@@ -59,5 +60,5 @@ class SSLRobot(Robot):
         self.v = np.concatenate((lin_v, ref_v[2:]))
     def _set_wheel_speeds(self, ws):
         assert(ws.shape == (4,1))
-        self.ws = ws
+        self.ws = np.clip(ws, -MAX_WHEEL_SPEED, MAX_WHEEL_SPEED)
         self._convert_speeds()

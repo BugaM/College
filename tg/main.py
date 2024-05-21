@@ -6,6 +6,8 @@ import sys
 
 # ACCELERATED = True
 ACCELERATED = False
+
+DRAW_PATH = True
 if ACCELERATED:
     steps = ACCELERATED_STEPS
 else:
@@ -19,7 +21,7 @@ while running:
             running = False
 
     # keys = pygame.key.get_pressed()
-    simulation.run(steps)
+    simulation.run(steps, draw_path=DRAW_PATH)
 
 pygame.quit()
 sys.exit()
