@@ -9,8 +9,12 @@ class Robot (ABC):
         self.decision = decision
         self.r = r
         self.l = l
+        self.origal_pos = pos
         self.pos = pos
         self.psi = 0
+        self.v = np.array([0,0,0]).T
+    def reset_pos(self):
+        self.pos = self.original_pos
         self.v = np.array([0,0,0]).T
     def move(self):
         self.pos = self.pos + self.v[:2]
