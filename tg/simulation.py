@@ -1,6 +1,5 @@
 import pygame
 import math
-from numpy.linalg import norm
 import numpy as np
 from constants.field_constants import *
 from constants.robot_constants import *
