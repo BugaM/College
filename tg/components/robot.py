@@ -40,11 +40,15 @@ class Robot (ABC):
         return np.arctan2(self.pos[1], self.pos[0])
     @property
     def R(self):
-        psi = self.psi
+        psi = float(self.psi)
         return np.array([
-                        [np.cos(psi), -np.sin(psi)],
-                        [ np.sin(psi), np.cos(psi)]
-        ]).reshape(2,2)
+        [np.cos(psi), -np.sin(psi), 0],
+        [np.sin(psi), np.cos(psi), 0],
+        [0, 0, 1]
+    ])
+    @property
+    def R_inv(self):
+        return np.linalg.inv(self.R)
 
 class SSLRobot(Robot):
     def __init__(self, decision, pos, r, l) -> None:
@@ -56,8 +60,8 @@ class SSLRobot(Robot):
     def _convert_speeds(self):
         # v = [vx,vy,w]
         ref_v = self.controller.transform_velocities(self.ws)
-        lin_v = self.R @ ref_v[:2]
-        self.v = np.concatenate((lin_v, ref_v[2:]))
+        # convert to global reference
+        self.v = self.R @ ref_v
     def _set_wheel_speeds(self, ws):
         assert(ws.shape == (4,1))
         self.ws = np.clip(ws, -MAX_WHEEL_SPEED, MAX_WHEEL_SPEED)

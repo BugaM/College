@@ -16,6 +16,8 @@ class SSLController(Controller):
     def __init__(self, radius, length) -> None:
         super().__init__(radius, length)
         self.M = self.build_transformation_matrix()
+        # Pseudo Inverse
+        self.M_pinv = np.linalg.pinv(self.M)
 
     def build_transformation_matrix(self):
         sqrt2 = np.sqrt(2)

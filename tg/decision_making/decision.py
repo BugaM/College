@@ -12,10 +12,10 @@ class ConstantDecision(Decision):
     def get_decision(self):
         return self.v
     
-    class InputedDecision(Decision):
-        def __init__(self, v) -> None:
-            self.v = v
-        def set_v(self,v):
-            self.v = v
-        def get_decision(self):
-            return self.v
+class InputedDecision(Decision):
+    def __init__(self, v) -> None:
+        self.v = v
+    def set_v(self,v):
+        self.v = v
+    def get_decision(self):
+        return self.v
