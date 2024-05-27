@@ -5,22 +5,22 @@ import numpy as np
 from constants.field_constants import *
 from constants.robot_constants import *
 from components.robot import SSLRobot
-from decision_making.decision import ConstantDecision
 
 class Simulation:
-    def __init__(self) -> None:
+    def __init__(self, decision) -> None:
         pygame.init()
-        self.path = []
+        self.center_path = []
+        self.front_path = []
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
-        decision = ConstantDecision(np.array([[0.01,-0.01,-0.04,0.3]]).T)
-        self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, WHEEL_RADIUS, WHEEL_LENGTH)
+        self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
 
     def run(self, steps, draw_path):
         for _ in range(steps):
             self.update_player()
             if draw_path:
-                self.path.append(self.player.pos.reshape(2))
+                self.center_path.append(self.player.pos.reshape(2))
+                self.front_path.append(self.player.front.reshape(2))
             self.check_collision()
         self.draw()
 
@@ -47,9 +47,10 @@ class Simulation:
 
     def draw_path(self):
         # Draw the path given a list of positions
-        if len(self.path) > 1:
-            pygame.draw.lines(self.screen, PATH_COLOR, False, self.path, LINE_WIDTH)
-
+        if len(self.center_path) > 1:
+            pygame.draw.lines(self.screen, CENTER_PATH_COLOR, False, self.center_path, LINE_WIDTH)
+        if len(self.front_path) > 1:
+            pygame.draw.lines(self.screen, FRONT_PATH_COLOR, False, self.front_path, LINE_WIDTH//2)
 
     def draw(self):
         self.screen.fill(FIELD_COLOR)
@@ -57,9 +58,8 @@ class Simulation:
         self.draw_path()
 
 
-        player_front = self.player.pos + PLAYER_RADIUS/2 * np.array([np.cos(self.player.psi),np.sin(self.player.psi)])
         pygame.draw.circle(self.screen, PLAYER_COLOR, self.player.pos.reshape(2), PLAYER_RADIUS)
-        pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, player_front.reshape(2), FRONT_RADIUS)
+        pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, self.player.front.reshape(2), FRONT_RADIUS)
         pygame.display.flip()
 
 

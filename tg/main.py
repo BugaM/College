@@ -1,8 +1,10 @@
 
 from simulation import Simulation
-from constants.field_constants import  ACCELERATED_STEPS
+from constants.field_constants import ACCELERATED_STEPS
 import pygame
 import sys
+from decision_making.decision import ConstantVsDecision, ConstantWsDecision
+import numpy as np
 
 # ACCELERATED = True
 ACCELERATED = False
@@ -13,7 +15,9 @@ if ACCELERATED:
 else:
     steps = 1
 
-simulation = Simulation()
+# decision = ConstantWsDecision(np.array([[0.01,-0.01,-0.04,0.3]]).T)
+decision = ConstantVsDecision(np.array([[0, 0.6, 0.01]]).T)
+simulation = Simulation(decision)
 running = True
 while running:
     for event in pygame.event.get():

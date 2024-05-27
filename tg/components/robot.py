@@ -5,11 +5,12 @@ from constants.robot_constants import MAX_WHEEL_SPEED
 import numpy as np
 
 class Robot (ABC):
-    def __init__(self, decision, pos, r, l) -> None:
+    def __init__(self, decision, pos, r, w_r, w_l) -> None:
         assert isinstance(decision, Decision), "decision must Inherit from Decision"
         self.decision = decision
         self.r = r
-        self.l = l
+        self.w_r = w_r
+        self.w_l = w_l
         self.origal_pos = pos
         self.pos = pos
         self.psi = 0
@@ -21,11 +22,14 @@ class Robot (ABC):
         self.pos = self.pos + self.v[:2]
         self.psi = Robot.constrain_angle(self.psi + self.v[2])
     def update(self):
-        self._set_wheel_speeds(self.decision.get_decision())
+        decision_function = self.decision.get_decision_ws()
+        self._set_wheel_speeds(decision_function(robot=self))
         self.move()
+
     @classmethod
     def constrain_angle(cls, angle):
         return (angle + np.pi) % (2 * np.pi) - np.pi
+    
     @abstractmethod
     def _initialize_controller (self):
         pass
@@ -35,9 +39,11 @@ class Robot (ABC):
     @abstractmethod
     def _set_wheel_speeds(self, ws):
         pass
+
     @property
     def theta(self):
         return np.arctan2(self.pos[1], self.pos[0])
+    
     @property
     def R(self):
         psi = float(self.psi)
@@ -46,17 +52,22 @@ class Robot (ABC):
         [np.sin(psi), np.cos(psi), 0],
         [0, 0, 1]
     ])
+
     @property
     def R_inv(self):
         return np.linalg.inv(self.R)
+    
+    @property
+    def front(self):
+         return self.pos + self.r/2 * np.array([np.cos(self.psi),np.sin(self.psi)])
 
 class SSLRobot(Robot):
-    def __init__(self, decision, pos, r, l) -> None:
-        super().__init__(decision, pos, r, l)
+    def __init__(self, decision, pos, r, w_r, w_l) -> None:
+        super().__init__(decision, pos, r, w_r, w_l)
         self.ws = np.array([0,0,0,0]).T
         self._initialize_controller()
     def _initialize_controller(self):
-        self.controller = SSLController(self.r, self.l)
+        self.controller = SSLController(self.w_r, self.w_l)
     def _convert_speeds(self):
         # v = [vx,vy,w]
         ref_v = self.controller.transform_velocities(self.ws)
@@ -66,3 +77,5 @@ class SSLRobot(Robot):
         assert(ws.shape == (4,1))
         self.ws = np.clip(ws, -MAX_WHEEL_SPEED, MAX_WHEEL_SPEED)
         self._convert_speeds()
+    def get_possible_ws_for_v(self, v):
+        return self.controller.M_pinv @ self.R_inv @ v
