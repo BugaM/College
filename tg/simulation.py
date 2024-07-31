@@ -1,5 +1,6 @@
 import pygame
-import math
+import matplotlib.pyplot as plt
+
 import numpy as np
 from constants.field_constants import *
 from constants.robot_constants import *
@@ -10,13 +11,16 @@ class Simulation:
         pygame.init()
         self.center_path = []
         self.front_path = []
+        self.ws_history = []
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
 
-    def run(self, steps, draw_path):
+    def run(self, steps, draw_path, get_history):
         for _ in range(steps):
             self.update_player()
+            if get_history:
+                self.ws_history.append(self.player.ws)
             if draw_path:
                 self.center_path.append(self.player.pos.reshape(2))
                 self.front_path.append(self.player.front.reshape(2))
@@ -62,6 +66,28 @@ class Simulation:
         pygame.display.flip()
 
 
+    def draw_ws_graphs(self):
+        vectors = self.ws_history 
+        num_dimensions = len(vectors[0])
+        
+        plt.rcParams.update({'font.size': 20})
+        # Iterate over each dimension
+        for dim in range(num_dimensions):
+            # Extract the current dimension from each vector
+            dim_values = [vector[dim] for vector in vectors]
+            
+            # Plotting the dimension values vs. their index
+            plt.figure(figsize=(20, 10))  # Create a new figure
+            plt.plot(dim_values, linestyle='-')  # Plot with line and markers
+            # plt.title(f'Dimension {dim+1} vs Index')
+
+            plt.xlabel('Number of steps'    )
+            plt.ylabel(f'Wheel Speed {dim+1} (arb. unit)')
+            
+            # Save the plot to a PNG file
+            plt.savefig(f'omega_001_WheelSpeed_{dim+1}.eps', format='eps')
+            plt.savefig(f'omega_001_WheelSpeed_{dim+1}.png')
+            plt.close()  # Close the figure to free up memory
     def check_collision(self):
         pass
         # player_pos = self.player.pos
