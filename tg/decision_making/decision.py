@@ -49,3 +49,13 @@ class ShapePathDecision(Decision):
         return robot.get_possible_ws_for_v(v)
     def get_decision_ws(self):
         return self.get_ws_for_path
+    
+class ReinforcementLearningDecision(Decision):
+    def __init__(self) -> None:
+        super().__init__()
+    def set_ws(self, w):
+        self.w = w
+    def get_ws(self, **kwargs):
+        return self.w
+    def get_decision_ws(self):
+        return self.get_ws

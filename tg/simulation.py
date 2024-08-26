@@ -27,6 +27,15 @@ class Simulation:
             self.check_collision()
         self.draw()
 
+    def get_player_pos(self):
+        return self.player.pos
+    def get_player_psi(self):
+        return self.player.psi
+    def get_player_ws(self):
+        return self.player.ws
+    def get_player_vs(self):
+        return self.player.v
+
     def update_player(self):
         self.player.update()
 
