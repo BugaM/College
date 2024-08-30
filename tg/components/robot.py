@@ -11,7 +11,7 @@ class Robot (ABC):
         self.r = r
         self.w_r = w_r
         self.w_l = w_l
-        self.origal_pos = pos
+        self.original_pos = pos
         self.pos = pos
         self.psi = 0
         self.v = np.array([0,0,0]).T

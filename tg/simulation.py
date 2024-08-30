@@ -7,14 +7,21 @@ from constants.robot_constants import *
 from components.robot import SSLRobot
 
 class Simulation:
-    def __init__(self, decision) -> None:
-        pygame.init()
+    def __init__(self, decision, render) -> None:
+        if render:
+            pygame.init()
+            
+            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            self.clock = pygame.time.Clock()
+        self.render = render
+        self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
+        self.reset()
+    
+    def reset(self):
         self.center_path = []
         self.front_path = []
         self.ws_history = []
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        self.clock = pygame.time.Clock()
-        self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
+        self.player.reset_pos()
 
     def run(self, steps, draw_path, get_history):
         for _ in range(steps):
@@ -25,7 +32,8 @@ class Simulation:
                 self.center_path.append(self.player.pos.reshape(2))
                 self.front_path.append(self.player.front.reshape(2))
             self.check_collision()
-        self.draw()
+        if self.render:
+            self.draw()
 
     def get_player_pos(self):
         return self.player.pos
@@ -97,6 +105,10 @@ class Simulation:
             plt.savefig(f'omega_001_WheelSpeed_{dim+1}.eps', format='eps')
             plt.savefig(f'omega_001_WheelSpeed_{dim+1}.png')
             plt.close()  # Close the figure to free up memory
+
+    def close(self):
+        if self.render:
+            pygame.quit()
     def check_collision(self):
         pass
         # player_pos = self.player.pos

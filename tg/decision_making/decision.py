@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from constants.robot_constants import TOLERANCE
+from constants.robot_constants import TOLERANCE, MAX_WHEEL_SPEED
 import math
 import numpy as np
 class Decision(ABC):
@@ -54,7 +54,7 @@ class ReinforcementLearningDecision(Decision):
     def __init__(self) -> None:
         super().__init__()
     def set_ws(self, w):
-        self.w = w
+        self.w = w * MAX_WHEEL_SPEED
     def get_ws(self, **kwargs):
         return self.w
     def get_decision_ws(self):

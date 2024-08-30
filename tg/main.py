@@ -22,7 +22,7 @@ else:
 # decision = ConstantWsDecision(np.array([[0.01,-0.01,-0.01,0.01]]).T)
 # decision = ConstantVsDecision(np.array([[-0.06, 0.0, 0.00]]).T)
 decision = ShapePathDecision(build_shape_from_center([[-100,100], [-100,-100], [100,-100], [100,100]]), 0.6, 0.05)
-simulation = Simulation(decision)
+simulation = Simulation(decision, render=True)
 running = True
 while running:
     for event in pygame.event.get():
@@ -30,7 +30,6 @@ while running:
             simulation.draw_ws_graphs()
             running = False
 
-    # keys = pygame.key.get_pressed()
     simulation.run(steps, draw_path=DRAW_PATH, get_history=GET_HISTORY)
 
 pygame.quit()
