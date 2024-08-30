@@ -21,7 +21,6 @@ class CustomEnv(gym.Env):
 
     def reset(self):
         self.simulation.reset()
-        self.steps = 0
         width = WIDTH/4
         height = HEIGHT/4
 
@@ -36,7 +35,6 @@ class CustomEnv(gym.Env):
 
     def step(self, action):
         self.previous_ws = self.simulation.get_player_ws()
-        self.steps += 1
         self.decision.set_ws(action)
         self.simulation.run(5,True, False, target=self.target_position)
         obs = self.get_observation()
@@ -88,10 +86,7 @@ class CustomEnv(gym.Env):
     def check_done(self):
         # Define when the episode is done
         player_position = self.simulation.get_player_pos()
-        in_target = np.linalg.norm(player_position - self.target_position) < TOLERANCE
-        if in_target or self.steps >= MAX_NUM_STEPS:
-            return True
-        return False
+        return np.linalg.norm(player_position - self.target_position) < TOLERANCE
 
     def render(self, mode='human'):
         self.simulation.draw(self.target_position)
