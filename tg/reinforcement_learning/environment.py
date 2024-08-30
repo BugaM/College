@@ -27,8 +27,7 @@ class CustomEnv(gym.Env):
         width = np.random.uniform(0,WIDTH)
         height = np.random.uniform(0,HEIGHT)
         self.target_position = np.array([[width, height]]).T
-        # self.target_psi = np.random.uniform(-np.pi, np.pi)
-        self.target_psi = 0
+        self.target_psi = np.random.uniform(-np.pi, np.pi)
         self.start_time = time.time()
         obs = self.get_observation()
         return obs
