@@ -23,7 +23,7 @@ class Simulation:
         self.ws_history = []
         self.player.reset_pos()
 
-    def run(self, steps, draw_path, get_history):
+    def run(self, steps, draw_path, get_history, target=None):
         for _ in range(steps):
             self.update_player()
             if get_history:
@@ -32,8 +32,8 @@ class Simulation:
                 self.center_path.append(self.player.pos.reshape(2))
                 self.front_path.append(self.player.front.reshape(2))
             self.check_collision()
-        if self.render:
-            self.draw()
+            if self.render:
+                self.draw(target)
 
     def get_player_pos(self):
         return self.player.pos
@@ -72,10 +72,12 @@ class Simulation:
         if len(self.front_path) > 1:
             pygame.draw.lines(self.screen, FRONT_PATH_COLOR, False, self.front_path, LINE_WIDTH//2)
 
-    def draw(self):
+    def draw(self, target):
         self.screen.fill(FIELD_COLOR)
         self.draw_field()
         self.draw_path()
+        if target is not None:
+             pygame.draw.circle(self.screen, TARGET_COLOR, target.reshape(2), TARGET_RADIUS)
 
 
         pygame.draw.circle(self.screen, PLAYER_COLOR, self.player.pos.reshape(2), PLAYER_RADIUS)

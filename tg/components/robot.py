@@ -14,10 +14,10 @@ class Robot (ABC):
         self.original_pos = pos
         self.pos = pos
         self.psi = 0
-        self.v = np.array([0,0,0]).T
+        self.v = np.array([[0,0,0]]).T
     def reset_pos(self):
         self.pos = self.original_pos
-        self.v = np.array([0,0,0]).T
+        self.v = np.array([[0,0,0]]).T
     def move(self):
         self.pos = self.pos + self.v[:2]
         self.psi = Robot.constrain_angle(self.psi + self.v[2])
@@ -64,7 +64,7 @@ class Robot (ABC):
 class SSLRobot(Robot):
     def __init__(self, decision, pos, r, w_r, w_l) -> None:
         super().__init__(decision, pos, r, w_r, w_l)
-        self.ws = np.array([0,0,0,0]).T
+        self.ws = np.array([[0,0,0,0]]).T
         self._initialize_controller()
     def _initialize_controller(self):
         self.controller = SSLController(self.w_r, self.w_l)

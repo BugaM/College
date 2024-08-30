@@ -8,7 +8,7 @@ from utils import build_shape_from_center
 import numpy as np
 
 # ACCELERATED = True
-ACCELERATED = True
+ACCELERATED = False
 
 DRAW_PATH = True
 
