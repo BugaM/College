@@ -7,8 +7,8 @@ from decision_making.decision import ConstantVsDecision, ConstantWsDecision, Sha
 from utils import build_shape_from_center
 import numpy as np
 
-# ACCELERATED = True
-ACCELERATED = False
+ACCELERATED = True
+# ACCELERATED = False
 
 DRAW_PATH = True
 
@@ -19,9 +19,9 @@ if ACCELERATED:
 else:
     steps = 1
 
-# decision = ConstantWsDecision(np.array([[0.01,-0.01,-0.01,0.01]]).T)
-# decision = ConstantVsDecision(np.array([[-0.06, 0.0, 0.00]]).T)
-decision = ShapePathDecision(build_shape_from_center([[-100,100], [-100,-100], [100,-100], [100,100]]), 0.6, 0.05)
+# decision = ConstantWsDecision(np.array([[10,-10,-10,10]]).T)
+# decision = ConstantVsDecision(np.array([[0.5, 0.5, 2]]).T)
+decision = ShapePathDecision(build_shape_from_center([[-1,1], [-1,-1], [1,-1], [1,1]]), 2, 15)
 simulation = Simulation(decision, render=True)
 running = True
 while running:

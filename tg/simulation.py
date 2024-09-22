@@ -2,16 +2,19 @@ import pygame
 import matplotlib.pyplot as plt
 
 import numpy as np
-from constants.field_constants import *
+from constants.simulation_constants import *
 from constants.robot_constants import *
 from components.robot import SSLRobot
+
+def get_target_front(target):
+     return target[:2] + TARGET_RADIUS * np.array([np.cos(target[2]),np.sin(target[2])])
 
 class Simulation:
     def __init__(self, decision, render) -> None:
         if render:
             pygame.init()
             
-            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            self.screen = pygame.display.set_mode((WIDTH_SIM, HEIGHT_SIM))
             self.clock = pygame.time.Clock()
         self.render = render
         self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
@@ -29,8 +32,8 @@ class Simulation:
             if get_history:
                 self.ws_history.append(self.player.ws)
             if draw_path:
-                self.center_path.append(self.player.pos.reshape(2))
-                self.front_path.append(self.player.front.reshape(2))
+                self.center_path.append(self.player.pos.reshape(2) * METERS_TO_PIXELS)
+                self.front_path.append(self.player.front.reshape(2) * METERS_TO_PIXELS)
             self.check_collision()
             if self.render:
                 self.draw(target)
@@ -49,39 +52,40 @@ class Simulation:
 
     def draw_field(self):
         # Draw the outer boundary
-        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN, BOUNDARY_MARGIN, WIDTH - 2 * BOUNDARY_MARGIN, HEIGHT - 2 * BOUNDARY_MARGIN), LINE_WIDTH)
+        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN_SIM, BOUNDARY_MARGIN_SIM, WIDTH_SIM - 2 * BOUNDARY_MARGIN_SIM, HEIGHT_SIM - 2 * BOUNDARY_MARGIN_SIM), LINE_WIDTH_SIM)
 
         # Draw the center circle
-        pygame.draw.circle(self.screen, LINE_COLOR, (WIDTH // 2, HEIGHT // 2), CENTER_CIRCLE_RADIUS, LINE_WIDTH)
+        pygame.draw.circle(self.screen, LINE_COLOR, (WIDTH_SIM // 2, HEIGHT_SIM // 2), CENTER_CIRCLE_RADIUS_SIM, LINE_WIDTH_SIM)
 
         # Draw the center line
-        pygame.draw.line(self.screen, LINE_COLOR, (WIDTH // 2, BOUNDARY_MARGIN), (WIDTH // 2, HEIGHT - BOUNDARY_MARGIN), LINE_WIDTH)
+        pygame.draw.line(self.screen, LINE_COLOR, (WIDTH_SIM // 2, BOUNDARY_MARGIN_SIM), (WIDTH_SIM // 2, HEIGHT_SIM - BOUNDARY_MARGIN_SIM), LINE_WIDTH_SIM)
 
         # Draw the penalty areas
-        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN, (HEIGHT // 2) - (PENALTY_AREA_HEIGHT // 2), PENALTY_AREA_WIDTH, PENALTY_AREA_HEIGHT), LINE_WIDTH)
-        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(WIDTH - BOUNDARY_MARGIN - PENALTY_AREA_WIDTH, (HEIGHT // 2) - (PENALTY_AREA_HEIGHT // 2), PENALTY_AREA_WIDTH, PENALTY_AREA_HEIGHT), LINE_WIDTH)
+        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN_SIM, (HEIGHT_SIM // 2) - (PENALTY_AREA_HEIGHT_SIM // 2), PENALTY_AREA_WIDTH_SIM, PENALTY_AREA_HEIGHT_SIM), LINE_WIDTH_SIM)
+        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(WIDTH_SIM - BOUNDARY_MARGIN_SIM - PENALTY_AREA_WIDTH_SIM, (HEIGHT_SIM // 2) - (PENALTY_AREA_HEIGHT_SIM // 2), PENALTY_AREA_WIDTH_SIM, PENALTY_AREA_HEIGHT_SIM), LINE_WIDTH_SIM)
 
         # Draw the goals
-        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN - GOAL_DEPTH, (HEIGHT // 2) - (GOAL_WIDTH // 2), GOAL_DEPTH, GOAL_WIDTH), LINE_WIDTH)
-        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(WIDTH - BOUNDARY_MARGIN, (HEIGHT // 2) - (GOAL_WIDTH // 2), GOAL_DEPTH, GOAL_WIDTH), LINE_WIDTH)
+        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN_SIM - GOAL_DEPTH_SIM, (HEIGHT_SIM // 2) - (GOAL_WIDTH_SIM // 2), GOAL_DEPTH_SIM, GOAL_WIDTH_SIM), LINE_WIDTH_SIM)
+        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(WIDTH_SIM - BOUNDARY_MARGIN_SIM, (HEIGHT_SIM // 2) - (GOAL_WIDTH_SIM // 2), GOAL_DEPTH_SIM, GOAL_WIDTH_SIM), LINE_WIDTH_SIM)
 
     def draw_path(self):
         # Draw the path given a list of positions
         if len(self.center_path) > 1:
-            pygame.draw.lines(self.screen, CENTER_PATH_COLOR, False, self.center_path, LINE_WIDTH)
+            pygame.draw.lines(self.screen, CENTER_PATH_COLOR, False, self.center_path, LINE_WIDTH_SIM)
         if len(self.front_path) > 1:
-            pygame.draw.lines(self.screen, FRONT_PATH_COLOR, False, self.front_path, LINE_WIDTH//2)
+            pygame.draw.lines(self.screen, FRONT_PATH_COLOR, False, self.front_path, LINE_WIDTH_SIM//2)
 
     def draw(self, target):
         self.screen.fill(FIELD_COLOR)
         self.draw_field()
         self.draw_path()
         if target is not None:
-             pygame.draw.circle(self.screen, TARGET_COLOR, target.reshape(2), TARGET_RADIUS)
+             pygame.draw.circle(self.screen, TARGET_COLOR, METERS_TO_PIXELS * target[:2].reshape(2), TARGET_RADIUS_SIM)
+             pygame.draw.circle(self.screen, TARGET_FRONT_COLOR, METERS_TO_PIXELS * get_target_front(target).reshape(2), TARGET_FRONT_RADIUS_SIM)
 
 
-        pygame.draw.circle(self.screen, PLAYER_COLOR, self.player.pos.reshape(2), PLAYER_RADIUS)
-        pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, self.player.front.reshape(2), FRONT_RADIUS)
+        pygame.draw.circle(self.screen, PLAYER_COLOR, METERS_TO_PIXELS * self.player.pos.reshape(2), PLAYER_RADIUS_SIM)
+        pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, METERS_TO_PIXELS * self.player.front.reshape(2), FRONT_RADIUS_SIM)
         pygame.display.flip()
 
 

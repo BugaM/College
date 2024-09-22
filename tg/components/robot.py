@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from components.controllers import SSLController
 from decision_making.decision import Decision
 from constants.robot_constants import MAX_WHEEL_SPEED
+from constants.simulation_constants import DELTA_T
+from utils import constrain_angle
 import numpy as np
 
 class Robot (ABC):
@@ -19,16 +21,12 @@ class Robot (ABC):
         self.pos = self.original_pos
         self.v = np.array([[0,0,0]]).T
     def move(self):
-        self.pos = self.pos + self.v[:2]
-        self.psi = Robot.constrain_angle(self.psi + self.v[2])
+        self.pos = self.pos + self.v[:2] * DELTA_T
+        self.psi = constrain_angle(self.psi + self.v[2] * DELTA_T)
     def update(self):
         decision_function = self.decision.get_decision_ws()
         self._set_wheel_speeds(decision_function(robot=self))
         self.move()
-
-    @classmethod
-    def constrain_angle(cls, angle):
-        return (angle + np.pi) % (2 * np.pi) - np.pi
     
     @abstractmethod
     def _initialize_controller (self):

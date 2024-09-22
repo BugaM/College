@@ -1,18 +1,28 @@
 from stable_baselines3 import PPO
 from reinforcement_learning.environment import CustomEnv
 from gym.wrappers.time_limit import TimeLimit
+from torch.nn import ReLU
 
 import argparse
 
-MAX_EPISODE_STEPS = 600
-TOTAL_TIMESTEPS = 8000000
+MAX_EPISODE_STEPS = 1024
+TOTAL_TIMESTEPS = 2**25
 
 def train(render, total_timesteps, max_episode_steps):
     # Initialize the environment
     env = CustomEnv(render=render)
     env = TimeLimit(env, max_episode_steps= max_episode_steps)
+
+    arch = [64, 64]
+    policy_kwargs = {'activation_fn':ReLU, 'net_arch':arch}
     # Initialize the PPO agent
-    model = PPO('MlpPolicy', env, verbose=1, device="cuda")
+    model = PPO('MlpPolicy',
+                env, 
+                verbose=1, 
+                batch_size=2**10, 
+                device="cpu", 
+                tensorboard_log="./ssl_tensorboard/", 
+                policy_kwargs=policy_kwargs)
 
     # Train the agent
     model.learn(total_timesteps=total_timesteps, progress_bar=True)  # Adjust the timesteps as needed
