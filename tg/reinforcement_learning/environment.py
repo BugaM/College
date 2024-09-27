@@ -16,6 +16,8 @@ MIN_HEIGHT = HEIGHT
 class CustomEnv(gym.Env):
     def __init__(self, render: bool):
         super(CustomEnv, self).__init__()
+        np.random.seed(42)
+
         self.decision = ReinforcementLearningDecision()
         self.simulation = Simulation(self.decision, render=render)
         self.reset()
@@ -26,8 +28,8 @@ class CustomEnv(gym.Env):
     @classmethod
     def get_observation_boundaries(cls):
         obs_low = np.array([
-            -2*WIDTH,     # Min relative x-position
-            -2*HEIGHT,    # Min relative y-position
+            -WIDTH,     # Min relative x-position
+            -HEIGHT,    # Min relative y-position
             -np.pi,     # Min relative psi
             -MAX_WHEEL_SPEED,  # Min wheel speed
             -MAX_WHEEL_SPEED,
@@ -39,8 +41,8 @@ class CustomEnv(gym.Env):
         ], dtype=np.float32).reshape(10,1)
 
         obs_high = np.array([
-            2*WIDTH,      # Max relative x-position
-            2*HEIGHT,     # Max relative y-position
+            WIDTH,      # Max relative x-position
+            HEIGHT,     # Max relative y-position
             np.pi,      # Max relative psi
             MAX_WHEEL_SPEED,   # Max wheel speed
             MAX_WHEEL_SPEED,
@@ -53,10 +55,10 @@ class CustomEnv(gym.Env):
         return obs_low, obs_high
 
     def reset(self):
-        self.simulation.reset()
+        self.simulation.reset(random=True)
 
-        width = np.random.uniform(0,WIDTH)
-        height = np.random.uniform(0,HEIGHT)
+        width = np.random.uniform(WIDTH/8,7*WIDTH/8)
+        height = np.random.uniform(HEIGHT/8,7*HEIGHT/8)
         self.target_position = np.array([[width, height]]).T
         self.target_psi = np.random.uniform(-np.pi, np.pi)
         self.start_time = time.time()
@@ -108,7 +110,7 @@ class CustomEnv(gym.Env):
         max_ws_diff_norm = 4 * MAX_WHEEL_SPEED
         ws_reward = -ws_diff_norm/max_ws_diff_norm
 
-        reward = dist_reward + 0.5 * angle_reward + 0.01 * ws_reward
+        reward = dist_reward + 0.1 * angle_reward + 0.005 * ws_reward
         return reward
 
     def check_done(self):

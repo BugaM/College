@@ -20,11 +20,11 @@ class Simulation:
         self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
         self.reset()
     
-    def reset(self):
+    def reset(self, random=False):
         self.center_path = []
         self.front_path = []
         self.ws_history = []
-        self.player.reset_pos()
+        self.player.reset_pos(random=random)
 
     def run(self, steps, draw_path, get_history, target=None):
         for _ in range(steps):

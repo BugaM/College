@@ -3,6 +3,7 @@ from components.controllers import SSLController
 from decision_making.decision import Decision
 from constants.robot_constants import MAX_WHEEL_SPEED
 from constants.simulation_constants import DELTA_T
+from constants.field_constants import WIDTH, HEIGHT
 from utils import constrain_angle
 import numpy as np
 
@@ -17,8 +18,15 @@ class Robot (ABC):
         self.pos = pos
         self.psi = 0
         self.v = np.array([[0,0,0]]).T
-    def reset_pos(self):
-        self.pos = self.original_pos
+    def reset_pos(self, random=False):
+        if random:
+            x = np.random.uniform(WIDTH/8, 7*WIDTH/8)
+            y = np.random.uniform(HEIGHT/8, 7*HEIGHT/8)
+            self.psi = np.random.uniform(-np.pi, np.pi)
+            self.pos = np.array([[x,y]]).T
+        else:
+            self.pos = self.original_pos
+            self.psi = 0
         self.v = np.array([[0,0,0]]).T
     def move(self):
         self.pos = self.pos + self.v[:2] * DELTA_T

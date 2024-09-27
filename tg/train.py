@@ -5,21 +5,29 @@ from torch.nn import ReLU
 
 import argparse
 
-MAX_EPISODE_STEPS = 1024
-TOTAL_TIMESTEPS = 2**25
+MAX_EPISODE_STEPS = 512
+TOTAL_TIMESTEPS = 2**24
 
 def train(render, total_timesteps, max_episode_steps):
     # Initialize the environment
     env = CustomEnv(render=render)
     env = TimeLimit(env, max_episode_steps= max_episode_steps)
 
-    arch = [64, 64]
-    policy_kwargs = {'activation_fn':ReLU, 'net_arch':arch}
+    policy_kwargs = dict(
+        activation_fn=ReLU,
+        net_arch=dict(pi=[64, 64], vf=[64, 64])
+    )
     # Initialize the PPO agent
     model = PPO('MlpPolicy',
                 env, 
                 verbose=1, 
+                n_steps=2**12,
                 batch_size=2**10, 
+                n_epochs=20,
+                gamma=0.999,
+                ent_coef=0.01,
+                clip_range=0.25,
+                learning_rate=6e-4,
                 device="cpu", 
                 tensorboard_log="./ssl_tensorboard/", 
                 policy_kwargs=policy_kwargs)
