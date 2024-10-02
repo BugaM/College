@@ -1,4 +1,3 @@
-from gym import Env
 from stable_baselines3 import PPO
 from reinforcement_learning.environment import CustomEnv
 from gym.wrappers.time_limit import TimeLimit
@@ -27,7 +26,7 @@ def train(render, total_timesteps, max_episode_steps):
                 n_steps=4096,
                 batch_size=1024, 
                 n_epochs=15,
-                gamma=0.985,
+                gamma=0.987,
                 ent_coef=1e-4,
                 clip_range=0.2,
                 learning_rate=1e-4,

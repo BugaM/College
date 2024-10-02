@@ -118,6 +118,10 @@ class CustomEnv(gym.Env):
     
         reward = dist_reward + 0.1 * angle_reward + 0.002 * ws_reward + 0.005 * tor_reward
 
+        if self.check_done():
+            # Large bonus for reaching the desired state
+            reward += 10
+
         return reward
 
     def check_done(self):
