@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from constants.robot_constants import TOLERANCE, MAX_WHEEL_SPEED
+from constants.robot_constants import POSITION_TOLERANCE, MAX_WHEEL_SPEED
 import math
 import numpy as np
 class Decision(ABC):
@@ -40,7 +40,7 @@ class ShapePathDecision(Decision):
         robot = kwargs["robot"]
 
         current_destination = self.shape[self.current]
-        if math.dist(current_destination, robot.pos) < TOLERANCE:
+        if math.dist(current_destination, robot.pos) < POSITION_TOLERANCE:
             self.current = (self.current + 1) % self.size
             current_destination = self.shape[self.current]
         pos_vector = current_destination - robot.pos  

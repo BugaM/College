@@ -79,13 +79,13 @@ class Simulation:
         self.screen.fill(FIELD_COLOR)
         self.draw_field()
         self.draw_path()
+        pygame.draw.circle(self.screen, PLAYER_COLOR, METERS_TO_PIXELS * self.player.pos.reshape(2), PLAYER_RADIUS_SIM)
+        pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, METERS_TO_PIXELS * self.player.front.reshape(2), FRONT_RADIUS_SIM)
         if target is not None:
              pygame.draw.circle(self.screen, TARGET_COLOR, METERS_TO_PIXELS * target[:2].reshape(2), TARGET_RADIUS_SIM)
              pygame.draw.circle(self.screen, TARGET_FRONT_COLOR, METERS_TO_PIXELS * get_target_front(target).reshape(2), TARGET_FRONT_RADIUS_SIM)
 
 
-        pygame.draw.circle(self.screen, PLAYER_COLOR, METERS_TO_PIXELS * self.player.pos.reshape(2), PLAYER_RADIUS_SIM)
-        pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, METERS_TO_PIXELS * self.player.front.reshape(2), FRONT_RADIUS_SIM)
         pygame.display.flip()
 
 

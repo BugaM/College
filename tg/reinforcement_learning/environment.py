@@ -3,9 +3,9 @@ import numpy as np
 import time
 from gym import spaces
 
-from constants.robot_constants import TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR
+from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOCITY_TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR, MAX_ACC
 from constants.field_constants import WIDTH, HEIGHT
-from constants.simulation_constants import SIMULATION_STEPS_PER_EVALUATION
+from constants.simulation_constants import RL_STEPS
 from decision_making.decision import ReinforcementLearningDecision
 from simulation import Simulation
 from utils import constrain_angle
@@ -14,12 +14,12 @@ MIN_WIDTH = WIDTH
 MIN_HEIGHT = HEIGHT
 
 class CustomEnv(gym.Env):
-    def __init__(self, render: bool):
+    def __init__(self, render: bool = False, seed = 42):
         super(CustomEnv, self).__init__()
-        np.random.seed(42)
-
+        np.random.seed(seed)
         self.decision = ReinforcementLearningDecision()
         self.simulation = Simulation(self.decision, render=render)
+        self.hold_history = render
         self.reset()
         obs_low, obs_high = self.get_observation_boundaries()
         self.observation_space = spaces.Box(low=obs_low, high=obs_high, dtype=np.float32)
@@ -68,7 +68,7 @@ class CustomEnv(gym.Env):
     def step(self, action):
         self.previous_ws = self.simulation.get_player_ws()
         self.decision.set_ws(action)
-        self.simulation.run(SIMULATION_STEPS_PER_EVALUATION * 2,True, False, target=np.concatenate((self.target_position, np.reshape(self.target_psi,(1,1)))))
+        self.simulation.run(RL_STEPS,self.hold_history, False, target=np.concatenate((self.target_position, np.reshape(self.target_psi,(1,1)))))
         obs = self.get_observation()
 
         reward = self.compute_reward()
@@ -96,27 +96,37 @@ class CustomEnv(gym.Env):
         player_psi = self.simulation.get_player_psi()
         player_position = self.simulation.get_player_pos()
         player_ws = self.simulation.get_player_ws()
+        player_v = np.linalg.norm(self.simulation.get_player_vs())
 
-        angle_diff2 = constrain_angle(player_psi - self.target_psi)**2
-        max_angle_diff2 = np.pi ** 2
-        angle_reward = -angle_diff2/max_angle_diff2
+        angle_diff = abs(constrain_angle(player_psi - self.target_psi))
+        max_angle_diff = np.pi
+        angle_reward = -angle_diff/max_angle_diff
 
         dist = np.linalg.norm(player_position - self.target_position)
         max_dist = np.linalg.norm((WIDTH, HEIGHT))
         dist_reward = -dist/max_dist
 
-
         ws_diff_norm = np.linalg.norm(player_ws - self.previous_ws)
         max_ws_diff_norm = 4 * MAX_WHEEL_SPEED
         ws_reward = -ws_diff_norm/max_ws_diff_norm
 
-        reward = dist_reward + 0.1 * angle_reward + 0.005 * ws_reward
+        tor_reward = 0
+        if dist < 5*POSITION_TOLERANCE:
+            max_torr_speed = np.sqrt(2*MAX_ACC*dist)
+            if player_v > max_torr_speed:
+                tor_reward = -(player_v - max_torr_speed)/player_v
+    
+        reward = dist_reward + 0.1 * angle_reward + 0.002 * ws_reward + 0.005 * tor_reward
+
         return reward
 
     def check_done(self):
         # Define when the episode is done
         player_position = self.simulation.get_player_pos()
-        return np.linalg.norm(player_position - self.target_position) < TOLERANCE
+        player_angle = self.simulation.get_player_psi()
+        return (np.linalg.norm(player_position - self.target_position) < POSITION_TOLERANCE and
+                abs(constrain_angle(player_angle - self.target_psi)) < ANGLE_TOLERANCE and
+                np.linalg.norm(self.simulation.get_player_vs()) < VELOCITY_TOLERANCE)
 
     def render(self, mode='human'):
         self.simulation.draw(np.concatenate((self.target_position, np.reshape(self.target_psi,(1,1)))))

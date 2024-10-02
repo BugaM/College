@@ -30,7 +30,7 @@ class Robot (ABC):
         self.v = np.array([[0,0,0]]).T
     def move(self):
         self.pos = self.pos + self.v[:2] * DELTA_T
-        self.psi = constrain_angle(self.psi + self.v[2] * DELTA_T)
+        self.psi = constrain_angle(self.psi + self.v[2] * DELTA_T).item()
     def update(self):
         decision_function = self.decision.get_decision_ws()
         self._set_wheel_speeds(decision_function(robot=self))
@@ -52,10 +52,9 @@ class Robot (ABC):
     
     @property
     def R(self):
-        psi = float(self.psi)
         return np.array([
-        [np.cos(psi), -np.sin(psi), 0],
-        [np.sin(psi), np.cos(psi), 0],
+        [np.cos(self.psi), -np.sin(self.psi), 0],
+        [np.sin(self.psi), np.cos(self.psi), 0],
         [0, 0, 1]
     ])
 
@@ -65,7 +64,7 @@ class Robot (ABC):
     
     @property
     def front(self):
-         return self.pos + self.r/2 * np.array([np.cos(self.psi),np.sin(self.psi)])
+         return self.pos + self.r/2 * np.array([[np.cos(self.psi),np.sin(self.psi)]]).T
 
 class SSLRobot(Robot):
     def __init__(self, decision, pos, r, w_r, w_l) -> None:
