@@ -4,14 +4,12 @@ import time
 from gym import spaces
 
 from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOCITY_TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR, MAX_ACC
-from constants.field_constants import WIDTH, HEIGHT
+from constants.field_constants import ROBOT_MAX_WIDTH, ROBOT_MIN_WIDTH, ROBOT_MAX_HEIGHT, ROBOT_MIN_HIGHT, WIDTH, HEIGHT
 from constants.simulation_constants import RL_STEPS
 from decision_making.decision import ReinforcementLearningDecision
 from simulation import Simulation
 from utils import constrain_angle
 
-MIN_WIDTH = WIDTH
-MIN_HEIGHT = HEIGHT
 
 class CustomEnv(gym.Env):
     def __init__(self, render: bool = False, seed = 42):
@@ -57,8 +55,8 @@ class CustomEnv(gym.Env):
     def reset(self):
         self.simulation.reset(random=True)
 
-        width = np.random.uniform(WIDTH/8,7*WIDTH/8)
-        height = np.random.uniform(HEIGHT/8,7*HEIGHT/8)
+        width = np.random.uniform(ROBOT_MIN_WIDTH,ROBOT_MAX_WIDTH)
+        height = np.random.uniform(ROBOT_MIN_HIGHT, ROBOT_MAX_HEIGHT)
         self.target_position = np.array([[width, height]]).T
         self.target_psi = np.random.uniform(-np.pi, np.pi)
         self.start_time = time.time()

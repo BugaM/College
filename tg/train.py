@@ -13,7 +13,7 @@ TOTAL_TIMESTEPS = 2**26
 
 def train(render, total_timesteps, max_episode_steps):
     # Initialize the environment
-    vec_env = make_vec_env(lambda: TimeLimit(CustomEnv(render, seed=42), max_episode_steps=max_episode_steps), n_envs=8)
+    vec_env = make_vec_env(lambda: TimeLimit(CustomEnv(render, seed=42), max_episode_steps=max_episode_steps), n_envs=1)
 
     policy_kwargs = dict(
         activation_fn=ReLU,
@@ -32,7 +32,7 @@ def train(render, total_timesteps, max_episode_steps):
                 learning_rate=1e-4,
                 seed=42,
                 device="cpu", 
-                tensorboard_log="./ssl_tensorboard/", 
+                # tensorboard_log="./ssl_tensorboard/", 
                 policy_kwargs=policy_kwargs)
 
     # Train the agent
