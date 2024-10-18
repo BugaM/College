@@ -1,5 +1,6 @@
 import numpy as np
-from constants.field_constants import  CENTER_X, CENTER_Y, ROBOT_MAX_WIDTH, ROBOT_MIN_WIDTH, ROBOT_MAX_HEIGHT, ROBOT_MIN_HIGHT, PLAYER_STARTING_DISTANCE_TOLERANCE
+from constants.field_constants import  CENTER_X, CENTER_Y, ROBOT_MAX_WIDTH, ROBOT_MIN_WIDTH, ROBOT_MAX_HEIGHT, ROBOT_MIN_HEIGHT, PLAYER_STARTING_DISTANCE_TOLERANCE
+from constants.robot_constants import MAX_VELOCITY
 
 def build_shape_from_center(list):
     converted = []
@@ -19,11 +20,18 @@ def generate_random_positions(current_positions: list, num_positions):
     for _ in range(num_positions):
         while True:
             width = np.random.uniform(ROBOT_MIN_WIDTH,ROBOT_MAX_WIDTH)
-            height = np.random.uniform(ROBOT_MIN_HIGHT, ROBOT_MAX_HEIGHT)
+            height = np.random.uniform(ROBOT_MIN_HEIGHT, ROBOT_MAX_HEIGHT)
             new_pos = np.array([[width, height]]).T
             if all(np.linalg.norm(new_pos - pos) >= PLAYER_STARTING_DISTANCE_TOLERANCE for pos in positions):
                 positions.append(new_pos)
                 new_positions.append(new_pos)
                 break
 
-    return new_positions
+    return np.array(new_positions)
+
+def generate_random_speeds(num_speeds):
+    speeds = []
+    for _ in range(num_speeds):
+        speed = np.array([np.random.uniform(-MAX_VELOCITY/3, MAX_VELOCITY/3, 2)]).T
+        speeds.append(speed)
+    return np.array(speeds)    

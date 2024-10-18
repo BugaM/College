@@ -5,13 +5,13 @@ import numpy as np
 from constants.simulation_constants import *
 from constants.robot_constants import *
 from components.robot import SSLRobot
-from utils import generate_random_positions
+from utils import generate_random_positions, generate_random_speeds
 
 def get_target_front(target):
      return target[:2] + TARGET_RADIUS * np.array([np.cos(target[2]),np.sin(target[2])])
 
 class Simulation:
-    def __init__(self, decision, render, num_opps = 3) -> None:
+    def __init__(self, decision, render, num_opps = 3, lidar_angles = 8) -> None:
         if render:
             pygame.init()
             
@@ -19,27 +19,35 @@ class Simulation:
             self.clock = pygame.time.Clock()
         self.num_opps = num_opps            
         self.render = render
+        self.lidar_angles = lidar_angles
+        self.lidar_read = None
         self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
         self.reset()
     
-    def reset(self, random=False):
+    def reset(self, random=False, target=None):
         self.center_path = []
         self.front_path = []
         self.ws_history = []
         self.player.reset_pos(random=random)
-        self.opp_postions = generate_random_positions([self.get_player_pos()],self.num_opps)
+        positions = [self.get_player_pos()]
+        if target is not None:
+            positions.append(target)
+        self.opp_positions = generate_random_positions(positions,self.num_opps)
+        self.opp_speeds = generate_random_speeds(self.num_opps)
 
     def run(self, steps, draw_path, get_history, target=None):
         for _ in range(steps):
             self.update_player()
+            if self.num_opps > 0:
+                self.update_opps()
             if get_history:
                 self.ws_history.append(self.player.ws)
             if draw_path:
                 self.center_path.append(self.player.pos.reshape(2) * METERS_TO_PIXELS)
                 self.front_path.append(self.player.front.reshape(2) * METERS_TO_PIXELS)
-            self.check_collision()
-            if self.render:
-                self.draw(target)
+        if self.render:
+            self.draw(target)
+        self.lidar_read = self.lidar(self.lidar_angles)
 
     def get_player_pos(self):
         return self.player.pos
@@ -49,9 +57,21 @@ class Simulation:
         return self.player.ws
     def get_player_vs(self):
         return self.player.v
+    def get_player_lidar_read(self):
+        if self.lidar_read is None:
+            self.lidar_read = self.lidar(self.lidar_angles)
+        return self.lidar_read
 
     def update_player(self):
         self.player.update()
+    
+    def update_opps(self):
+        self.opp_positions += DELTA_T * self.opp_speeds
+        for index, p in enumerate(self.opp_positions):
+            if p[0] < ROBOT_MIN_WIDTH or p[0] > ROBOT_MAX_WIDTH:
+                self.opp_speeds[index][0] *= -1
+            if p[1] < ROBOT_MIN_HEIGHT or p[1] > ROBOT_MAX_HEIGHT:
+                self.opp_speeds[index][1] *= -1
 
     def draw_field(self):
         # Draw the outer boundary
@@ -82,7 +102,7 @@ class Simulation:
         self.screen.fill(FIELD_COLOR)
         self.draw_field()
         self.draw_path()
-        for pos in self.opp_postions:
+        for pos in self.opp_positions:
             pygame.draw.circle(self.screen, OPP_COLOR, METERS_TO_PIXELS * pos.reshape(2), PLAYER_RADIUS_SIM)
         pygame.draw.circle(self.screen, PLAYER_COLOR, METERS_TO_PIXELS * self.player.pos.reshape(2), PLAYER_RADIUS_SIM)
         pygame.draw.circle(self.screen, PLAYER_FRONT_COLOR, METERS_TO_PIXELS * self.player.front.reshape(2), FRONT_RADIUS_SIM)
@@ -120,89 +140,50 @@ class Simulation:
     def close(self):
         if self.render:
             pygame.quit()
-    def check_collision(self):
-        pass
-        # player_pos = self.player.pos
-        # dist = math.dist(player_pos, ball_pos)
-
-        # if dist <= PLAYER_RADIUS + BALL_RADIUS:
-        #     pass
-        #     # Calculate velocities before collision
-        #     # TODO: fix this
 
     def lidar(self, n_angles):
-        player_pos = self.player.pos.reshape(2)
+        player_pos = self.player.pos  # Already in column vector format (2x1)
         player_psi = self.player.psi
         lidar_readings = []
 
+        # Create direction vectors as column vectors
         angles = np.linspace(0, 2 * np.pi, n_angles, endpoint=False)
-        
-        for angle in angles:
+        dir_vectors = np.vstack((np.cos(player_psi + angles), np.sin(player_psi + angles)))
+
+        for dir_vector in dir_vectors.T:  # Transpose to iterate over column vectors
+            dir_vector = dir_vector.reshape(2, 1)  # Ensure each is a (2,1) column vector
             min_distance = float('inf')
-            abs_angle = player_psi + angle
+            
+            # Check distances to walls with column vector format
+            if dir_vector[0, 0] != 0:
+                if dir_vector[0, 0] < 0:  # Left wall
+                    min_distance = min(min_distance, (LEFT_MARGIN - player_pos[0, 0]) / dir_vector[0, 0])
+                elif dir_vector[0, 0] > 0:  # Right wall
+                    min_distance = min(min_distance, (RIGHT_MARGIN - player_pos[0, 0]) / dir_vector[0, 0])
+            if dir_vector[1, 0] != 0:
+                if dir_vector[1, 0] < 0:  # Top wall
+                    min_distance = min(min_distance, (TOP_MARGIN - player_pos[1, 0]) / dir_vector[1, 0])
+                elif dir_vector[1, 0] > 0:  # Bottom wall
+                    min_distance = min(min_distance, (BOTTOM_MARGIN - player_pos[1, 0]) / dir_vector[1, 0])
 
-            # Check distances to walls
-            walls = [
-                (LEFT_MARGIN, player_pos[1]),  # Left wall
-                (RIGHT_MARGIN, player_pos[1]), # Right wall
-                (player_pos[0], TOP_MARGIN),   # Top wall
-                (player_pos[0], BOTTOM_MARGIN) # Bottom wall
-            ]
-            for wall_x, wall_y in walls:
-                distance = self.calculate_distance_to_wall(player_pos, abs_angle, wall_x, wall_y)
-                min_distance = min(min_distance, distance)
+            # Check distances to opponents, each as a (2,1) column vector
+            for opponent in self.opp_positions:
+                opponent = opponent.reshape(2, 1)
+                min_distance = min(min_distance, self.calculate_distance_to_circle(player_pos, dir_vector, opponent, PLAYER_RADIUS))
 
-            # Check distances to opponents
-            for opponent in self.opp_postions:
-                distance = self.calculate_distance_to_circle(player_pos, abs_angle, opponent, PLAYER_RADIUS)
-                min_distance = min(min_distance, distance)
+            if min_distance != float('inf'):
+                lidar_readings.append(min_distance * np.linalg.norm(dir_vector))
 
-            lidar_readings.append(min_distance)
+        return np.array([lidar_readings]).T
 
-        return np.array(lidar_readings)
-
-    def calculate_distance_to_wall(self, pos, angle, wall_x, wall_y):
-        # Get direction vector based on angle
-        dir_vector = np.array([np.cos(angle), np.sin(angle)])
-        
-        if wall_x == LEFT_MARGIN:
-            # Left wall
-            t = (LEFT_MARGIN - pos[0]) / dir_vector[0]
-        elif wall_x == RIGHT_MARGIN:
-            # Right wall
-            t = (RIGHT_MARGIN - pos[0]) / dir_vector[0]
-        elif wall_y == TOP_MARGIN:
-            # Top wall
-            t = (TOP_MARGIN - pos[1]) / dir_vector[1]
-        elif wall_y == BOTTOM_MARGIN:
-            # Bottom wall
-            t = (BOTTOM_MARGIN - pos[1]) / dir_vector[1]
-        else:
-            # If no wall match, return a large value
-            return float('inf')
-        
-        # Check if the t parameter is positive (meaning the wall is in the direction of the vector)
-        if t < 0:
-            return float('inf')
-
-        # Calculate the distance to the wall
-        return t * np.linalg.norm(dir_vector)
-
-    def calculate_distance_to_circle(self, pos, angle, circle_center, radius):
-        # Get direction vector based on angle
-        dir_vector = np.array([np.cos(angle), np.sin(angle)])
-        
-        # Calculate the vector from pos to the circle center
+    def calculate_distance_to_circle(self, pos, dir_vector, circle_center, radius):
         to_circle = circle_center - pos
-        proj_length = np.dot(to_circle, dir_vector)[0]
+        proj_length = np.dot(to_circle.T, dir_vector)[0, 0]  # Extract scalar from (1,1) array result
         
-        # Check if the circle is in the direction of the angle
         if proj_length < 0:
             return float('inf')
-        
-        # Calculate the closest distance from pos along the angle to the circle's edge
+
         closest_point = pos + proj_length * dir_vector
         dist_to_circle = np.linalg.norm(closest_point - circle_center)
         
-        # Subtract the radius to get the distance to the edge
         return max(0, proj_length - radius) if dist_to_circle <= radius else float('inf')

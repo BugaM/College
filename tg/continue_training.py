@@ -7,39 +7,25 @@ from torch.nn import ReLU
 
 import argparse
 
+MAX_EPISODE_STEPS = 1024
+TOTAL_TIMESTEPS = 2**26
+
+
 MAX_EPISODE_STEPS = 512
 TOTAL_TIMESTEPS = 2**25
 
 
-def train(render, total_timesteps, max_episode_steps):
+def continue_training(render, total_timesteps, max_episode_steps, model_path="ssl_model", log_path="ssl_tensorboard/best_opps"):
     # Initialize the environment
     vec_env = make_vec_env(lambda: TimeLimit(CustomEnv(render, seed=42, num_opps=5), max_episode_steps=max_episode_steps), n_envs=32)
-
-    policy_kwargs = dict(
-        activation_fn=ReLU,
-        net_arch=dict(pi=[256, 256], vf=[256, 256])
-    )
     # Initialize the PPO agent
-    model = PPO('MlpPolicy',
-                vec_env, 
-                verbose=1, 
-                n_steps=2048,
-                batch_size=512, 
-                n_epochs=15,
-                gamma=0.99,
-                ent_coef=1e-5,
-                clip_range=0.2,
-                learning_rate=5e-5,
-                seed=42,
-                device="cuda", 
-                tensorboard_log="./ssl_tensorboard/", 
-                policy_kwargs=policy_kwargs)
-
+    model = PPO.load(model_path, tensorboard_log=log_path)
+    model.set_env(vec_env)
     # Train the agent
-    model.learn(total_timesteps=total_timesteps, progress_bar=True)  # Adjust the timesteps as needed
+    model.learn(total_timesteps=total_timesteps, reset_num_timesteps=False, tb_log_name="continued", progress_bar=True)  # Adjust the timesteps as needed
 
     # Save the model
-    model.save("ssl_model")
+    model.save("ssl_model_continued")
 
     print("Finished training")
 
@@ -56,4 +42,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Call the main function with the render argument
-    train(render=args.render, max_episode_steps=args.max_episode_steps, total_timesteps=args.total_timesteps)
+    continue_training(render=args.render, max_episode_steps=args.max_episode_steps, total_timesteps=args.total_timesteps)
