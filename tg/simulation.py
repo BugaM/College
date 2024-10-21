@@ -68,9 +68,9 @@ class Simulation:
     def update_opps(self):
         self.opp_positions += DELTA_T * self.opp_speeds
         for index, p in enumerate(self.opp_positions):
-            if p[0] < ROBOT_MIN_WIDTH or p[0] > ROBOT_MAX_WIDTH:
+            if p[0] < ROBOT_MIN_WIDTH_FIELD or p[0] > ROBOT_MAX_WIDTH_FIELD:
                 self.opp_speeds[index][0] *= -1
-            if p[1] < ROBOT_MIN_HEIGHT or p[1] > ROBOT_MAX_HEIGHT:
+            if p[1] < ROBOT_MIN_HEIGHT_FIELD or p[1] > ROBOT_MAX_HEIGHT_FIELD:
                 self.opp_speeds[index][1] *= -1
 
     def draw_field(self):
@@ -157,14 +157,14 @@ class Simulation:
             # Check distances to walls with column vector format
             if dir_vector[0, 0] != 0:
                 if dir_vector[0, 0] < 0:  # Left wall
-                    min_distance = min(min_distance, (LEFT_MARGIN - player_pos[0, 0]) / dir_vector[0, 0])
+                    min_distance = min(min_distance, (LEFT_WALL - player_pos[0, 0]) / dir_vector[0, 0])
                 elif dir_vector[0, 0] > 0:  # Right wall
-                    min_distance = min(min_distance, (RIGHT_MARGIN - player_pos[0, 0]) / dir_vector[0, 0])
+                    min_distance = min(min_distance, (RIGHT_WALL - player_pos[0, 0]) / dir_vector[0, 0])
             if dir_vector[1, 0] != 0:
                 if dir_vector[1, 0] < 0:  # Top wall
-                    min_distance = min(min_distance, (TOP_MARGIN - player_pos[1, 0]) / dir_vector[1, 0])
+                    min_distance = min(min_distance, (TOP_WALL - player_pos[1, 0]) / dir_vector[1, 0])
                 elif dir_vector[1, 0] > 0:  # Bottom wall
-                    min_distance = min(min_distance, (BOTTOM_MARGIN - player_pos[1, 0]) / dir_vector[1, 0])
+                    min_distance = min(min_distance, (BOTTOM_WALL - player_pos[1, 0]) / dir_vector[1, 0])
 
             # Check distances to opponents, each as a (2,1) column vector
             for opponent in self.opp_positions:

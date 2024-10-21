@@ -12,10 +12,10 @@ TOTAL_TIMESTEPS = 2**26
 
 
 MAX_EPISODE_STEPS = 512
-TOTAL_TIMESTEPS = 2**25
+TOTAL_TIMESTEPS = 2**21
 
 
-def continue_training(render, total_timesteps, max_episode_steps, model_path="ssl_model", log_path="ssl_tensorboard/best_opps"):
+def continue_training(render, total_timesteps, max_episode_steps, model_path="ssl_model_12h", log_path="12h"):
     # Initialize the environment
     vec_env = make_vec_env(lambda: TimeLimit(CustomEnv(render, seed=42, num_opps=5), max_episode_steps=max_episode_steps), n_envs=32)
     # Initialize the PPO agent

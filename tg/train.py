@@ -2,13 +2,14 @@ from stable_baselines3 import PPO
 from reinforcement_learning.environment import CustomEnv
 from gym.wrappers.time_limit import TimeLimit
 from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.callbacks import EvalCallback
 
 from torch.nn import ReLU
 
 import argparse
 
 MAX_EPISODE_STEPS = 512
-TOTAL_TIMESTEPS = 2**25
+TOTAL_TIMESTEPS = 2**26
 
 
 def train(render, total_timesteps, max_episode_steps):
@@ -34,12 +35,22 @@ def train(render, total_timesteps, max_episode_steps):
                 device="cuda", 
                 tensorboard_log="./ssl_tensorboard/", 
                 policy_kwargs=policy_kwargs)
+    
+    eval_env = make_vec_env(lambda: TimeLimit(CustomEnv(render=False, seed=10, num_opps=5), max_episode_steps=max_episode_steps), n_envs=1)
+
+    # Set up EvalCallback
+    eval_callback = EvalCallback(eval_env, 
+                                 best_model_save_path='./best_model/',
+                                 log_path='./best_model/',
+                                 eval_freq=10000,  # Evaluate every 10000 timesteps
+                                 deterministic=True, 
+                                 render=False)
 
     # Train the agent
-    model.learn(total_timesteps=total_timesteps, progress_bar=True)  # Adjust the timesteps as needed
+    model.learn(total_timesteps=total_timesteps, progress_bar=True, callback=eval_callback)  # Adjust the timesteps as needed
 
     # Save the model
-    model.save("ssl_model")
+    model.save("ssl_model_callback")
 
     print("Finished training")
 

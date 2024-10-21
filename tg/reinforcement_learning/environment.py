@@ -3,7 +3,7 @@ import numpy as np
 from gym import spaces
 
 from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOCITY_TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR, MAX_ACC
-from constants.field_constants import ROBOT_MAX_WIDTH, ROBOT_MIN_WIDTH, ROBOT_MAX_HEIGHT, ROBOT_MIN_HEIGHT, WIDTH, HEIGHT, PLAYER_RADIUS
+from constants.field_constants import *
 from constants.simulation_constants import RL_STEPS
 from decision_making.decision import ReinforcementLearningDecision
 from simulation import Simulation
@@ -56,8 +56,8 @@ class CustomEnv(gym.Env):
         return obs_low, obs_high
 
     def reset(self):
-        width = np.random.uniform(ROBOT_MIN_WIDTH,ROBOT_MAX_WIDTH)
-        height = np.random.uniform(ROBOT_MIN_HEIGHT, ROBOT_MAX_HEIGHT)
+        width = np.random.uniform(ROBOT_MIN_WIDTH_FIELD,ROBOT_MAX_WIDTH_FIELD)
+        height = np.random.uniform(ROBOT_MIN_HEIGHT_FIELD, ROBOT_MAX_HEIGHT_FIELD)
         self.target_position = np.array([[width, height]]).T
         self.target_psi = np.random.uniform(-np.pi, np.pi)
 
@@ -121,7 +121,7 @@ class CustomEnv(gym.Env):
         ws_diff_norm = np.linalg.norm(player_ws - self.previous_ws)
         max_ws_diff_norm = 4 * MAX_WHEEL_SPEED
         ws_reward = -ws_diff_norm/max_ws_diff_norm
-        ws_reward = 0 # Tirei
+        # ws_reward = 0 # Tirei
 
         tor_reward = 0
         #  Tirei Torr
