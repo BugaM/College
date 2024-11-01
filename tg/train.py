@@ -9,7 +9,7 @@ from torch.nn import ReLU
 import argparse
 
 MAX_EPISODE_STEPS = 512
-TOTAL_TIMESTEPS = 2**26
+TOTAL_TIMESTEPS = 2**26 + 2**25
 
 
 def train(render, total_timesteps, max_episode_steps):
@@ -40,8 +40,8 @@ def train(render, total_timesteps, max_episode_steps):
 
     # Set up EvalCallback
     eval_callback = EvalCallback(eval_env, 
-                                 best_model_save_path='./best_model/',
-                                 log_path='./best_model/',
+                                 best_model_save_path='./noised_model/',
+                                 log_path='./noised_model/',
                                  eval_freq=10000,  # Evaluate every 10000 timesteps
                                  deterministic=True, 
                                  render=False)
@@ -50,7 +50,7 @@ def train(render, total_timesteps, max_episode_steps):
     model.learn(total_timesteps=total_timesteps, progress_bar=True, callback=eval_callback)  # Adjust the timesteps as needed
 
     # Save the model
-    model.save("ssl_model_callback")
+    model.save("ssl_model_noised_2")
 
     print("Finished training")
 

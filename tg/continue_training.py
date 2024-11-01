@@ -2,30 +2,40 @@ from stable_baselines3 import PPO
 from reinforcement_learning.environment import CustomEnv
 from gym.wrappers.time_limit import TimeLimit
 from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.callbacks import EvalCallback
+
 
 from torch.nn import ReLU
 
 import argparse
 
-MAX_EPISODE_STEPS = 1024
-TOTAL_TIMESTEPS = 2**26
 
 
 MAX_EPISODE_STEPS = 512
-TOTAL_TIMESTEPS = 2**21
+TOTAL_TIMESTEPS = 2**24
 
 
-def continue_training(render, total_timesteps, max_episode_steps, model_path="ssl_model_12h", log_path="12h"):
+def continue_training(render, total_timesteps, max_episode_steps, model_path="ssl_model_noised_2", log_path="ssl_model_noised_2"):
     # Initialize the environment
     vec_env = make_vec_env(lambda: TimeLimit(CustomEnv(render, seed=42, num_opps=5), max_episode_steps=max_episode_steps), n_envs=32)
     # Initialize the PPO agent
     model = PPO.load(model_path, tensorboard_log=log_path)
     model.set_env(vec_env)
+
+    eval_env = make_vec_env(lambda: TimeLimit(CustomEnv(render=False, seed=10, num_opps=5), max_episode_steps=max_episode_steps), n_envs=1)
+    eval_path = "./noised_model_2_continued/"
+    # Set up EvalCallback
+    eval_callback = EvalCallback(eval_env, 
+                                 best_model_save_path=eval_path,
+                                 log_path=eval_path,
+                                 eval_freq=10000,  # Evaluate every 10000 timesteps
+                                 deterministic=True, 
+                                 render=False)
     # Train the agent
-    model.learn(total_timesteps=total_timesteps, reset_num_timesteps=False, tb_log_name="continued", progress_bar=True)  # Adjust the timesteps as needed
+    model.learn(total_timesteps=total_timesteps, reset_num_timesteps=False, tb_log_name="continued", progress_bar=True, callback=eval_callback)  # Adjust the timesteps as needed
 
     # Save the model
-    model.save("ssl_model_continued")
+    model.save("ssl_noised_model_2_continued")
 
     print("Finished training")
 

@@ -32,6 +32,9 @@ def generate_random_positions(current_positions: list, num_positions):
 def generate_random_speeds(num_speeds):
     speeds = []
     for _ in range(num_speeds):
-        speed = np.array([np.random.uniform(-MAX_VELOCITY/3, MAX_VELOCITY/3, 2)]).T
+        abs_speed = np.random.normal(MAX_VELOCITY/2, MAX_VELOCITY/6)
+        angle = np.random.uniform(-np.pi, np.pi)
+        speed = abs_speed * np.array([[np.cos(angle), np.sin(angle)]]).T
+
         speeds.append(speed)
     return np.array(speeds)    
