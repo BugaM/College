@@ -8,7 +8,7 @@ from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOC
 import numpy as np
 
 # Initialize the environment
-env = CustomEnv(render=True, num_opps=10, seed = 20)
+env = CustomEnv(render=True, num_opps=10, seed = 20, draw_lidar=True)
 env = TimeLimit(env, max_episode_steps=510)
 model = PPO.load("ssl_model_noised_2 copy", env)
 # model = PPO.load("ssl_model_noised", env)

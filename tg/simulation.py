@@ -11,7 +11,7 @@ def get_target_front(target):
      return target[:2] + TARGET_RADIUS * np.array([np.cos(target[2]),np.sin(target[2])])
 
 class Simulation:
-    def __init__(self, decision, render, num_opps = 3, lidar_angles = 8) -> None:
+    def __init__(self, decision, render, num_opps = 3, lidar_angles = 8, draw_lidar = False) -> None:
         if render:
             pygame.init()
             
@@ -20,6 +20,7 @@ class Simulation:
         self.num_opps = num_opps            
         self.render = render
         self.lidar_angles = lidar_angles
+        self.draw_lidar = draw_lidar
         self.lidar_read = None
         self.player = SSLRobot(decision,np.array([PLAYER_START_POS]).T, PLAYER_RADIUS, WHEEL_RADIUS, WHEEL_LENGTH)
         self.reset()
@@ -111,7 +112,18 @@ class Simulation:
             pygame.draw.circle(self.screen, TARGET_FRONT_COLOR, METERS_TO_PIXELS * get_target_front(target).reshape(2), TARGET_FRONT_RADIUS_SIM)
 
 
+        if self.draw_lidar:
+            self.draw_lidar_rays()
+    
         pygame.display.flip()
+
+    def draw_lidar_rays(self):
+        player_pos = self.player.pos.reshape(2) * METERS_TO_PIXELS
+        angles = np.linspace(0, 2 * np.pi, self.lidar_angles, endpoint=False)
+        
+        for i, angle in enumerate(angles):
+            end_pos = player_pos + self.lidar_read[i][0] * np.array([np.cos(self.player.psi + angle), np.sin(self.player.psi + angle)]) * METERS_TO_PIXELS
+            pygame.draw.line(self.screen, LIDAR_COLOR, player_pos, end_pos, 1)
 
 
     def draw_ws_graphs(self):

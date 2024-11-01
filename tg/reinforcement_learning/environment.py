@@ -12,13 +12,13 @@ from utils import constrain_angle
 
 
 class CustomEnv(gym.Env):
-    def __init__(self, render: bool = False, seed = 42, n_angles = 12, num_opps = 9,  add_noise = True):
+    def __init__(self, render: bool = False, seed = 42, n_angles = 12, num_opps = 9,  add_noise = True, draw_lidar = False):
         super(CustomEnv, self).__init__()
         np.random.seed(seed)
         self.decision = ReinforcementLearningDecision()
         self.add_noise = add_noise
         self.n_angles = n_angles
-        self.simulation = Simulation(self.decision, render=render, num_opps=num_opps, lidar_angles=n_angles)
+        self.simulation = Simulation(self.decision, render=render, num_opps=num_opps, lidar_angles=n_angles, draw_lidar=draw_lidar)
         self.hold_history = render
         self.reset()
         obs_low, obs_high = self.get_observation_boundaries()
@@ -143,15 +143,12 @@ class CustomEnv(gym.Env):
         ws_diff_norm = np.linalg.norm(player_ws - self.previous_ws)
         max_ws_diff_norm = 4 * MAX_WHEEL_SPEED
         ws_reward = -ws_diff_norm/max_ws_diff_norm
-        # ws_reward = 0 # Tirei
     
         reward = dist_reward + 0.1 * angle_reward + 0.002 * ws_reward
 
         for read in lidar_read:
             if read < PLAYER_RADIUS:
                 reward -= 1.2
-            # elif read < 2*PLAYER_RADIUS:
-            #     reward -= 0.1 * 1/(read.item()/(2*PLAYER_RADIUS))
         
         if dist < POSITION_TOLERANCE:
             reward += 0.05
