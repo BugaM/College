@@ -7,14 +7,17 @@ from constants.simulation_constants import DELTA_T, RL_STEPS
 from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOCITY_TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR, MAX_ACC
 import numpy as np
 
+GET_HISTORY = True
+
 # Initialize the environment
-env = CustomEnv(render=True, num_opps=10, seed = 20, draw_lidar=True)
+env = CustomEnv(render=True, num_opps=10, seed = 20, draw_lidar=True, get_histoy=GET_HISTORY)
 env = TimeLimit(env, max_episode_steps=510)
 model = PPO.load("ssl_model_noised_2 copy", env)
 # model = PPO.load("ssl_model_noised", env)
 
 # Test the trained agent
 obs = env.reset()
+episode = 0
 while True:
     start = time.time()
     action, _states = model.predict(obs, deterministic=True)
@@ -32,6 +35,12 @@ while True:
         if time.time() - start >= RL_STEPS * DELTA_T:
             break
     if done:
+        episode +=1
+        print( np.linalg.norm(env.simulation.get_player_vs()[:2]))
+        print( env.simulation.get_player_vs())
+        print( env.simulation.get_player_ws())
+        if episode <= 3:
+            env.simulation.draw_ws_graphs(name=f"episode_{episode}_ws")
         obs = env.reset()
 
 env.close()

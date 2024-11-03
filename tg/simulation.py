@@ -75,6 +75,9 @@ class Simulation:
                 self.opp_speeds[index][1] *= -1
 
     def draw_field(self):
+        # Draw the outer walls
+        pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(0, 0, WIDTH_SIM, HEIGHT_SIM), LINE_WIDTH_SIM)
+        
         # Draw the outer boundary
         pygame.draw.rect(self.screen, LINE_COLOR, pygame.Rect(BOUNDARY_MARGIN_SIM, BOUNDARY_MARGIN_SIM, WIDTH_SIM - 2 * BOUNDARY_MARGIN_SIM, HEIGHT_SIM - 2 * BOUNDARY_MARGIN_SIM), LINE_WIDTH_SIM)
 
@@ -126,7 +129,7 @@ class Simulation:
             pygame.draw.line(self.screen, LIDAR_COLOR, player_pos, end_pos, 1)
 
 
-    def draw_ws_graphs(self):
+    def draw_ws_graphs(self, name= "wheel_speed"):
         vectors = self.ws_history 
         num_dimensions = len(vectors[0])
         
@@ -142,11 +145,11 @@ class Simulation:
             # plt.title(f'Dimension {dim+1} vs Index')
 
             plt.xlabel('Number of steps'    )
-            plt.ylabel(f'Wheel Speed {dim+1} (arb. unit)')
+            plt.ylabel(f'Wheel Speed {dim+1} (rad/s)')
             
             # Save the plot to a PNG file
-            plt.savefig(f'omega_001_WheelSpeed_{dim+1}.eps', format='eps')
-            plt.savefig(f'omega_001_WheelSpeed_{dim+1}.png')
+            # plt.savefig(f'{name}_{dim+1}.eps', format='eps')
+            plt.savefig(f'{name}_{dim+1}.png')
             plt.close()  # Close the figure to free up memory
 
     def close(self):
