@@ -2,7 +2,7 @@ import gym
 import numpy as np
 from gym import spaces
 
-from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOCITY_TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR, MAX_ACC
+from constants.robot_constants import POSITION_TOLERANCE, ANGLE_TOLERANCE, VELOCITY_TOLERANCE, MAX_WHEEL_SPEED, MAX_VELOCITY, MAX_ANGULAR, MAX_ACC, WS_NORM_TOLERANCE
 from constants.field_constants import *
 from constants.noise import STTDEV_ROBOT_P, STDDEV_TARGET_P, STDEV_TARGET_PSI, STDEV_ROBOT_PSI
 from constants.simulation_constants import RL_STEPS
@@ -12,12 +12,13 @@ from utils import constrain_angle
 
 
 class CustomEnv(gym.Env):
-    def __init__(self, render: bool = False, seed = 42, n_angles = 12, num_opps = 9,  add_noise = True, draw_lidar = False):
+    def __init__(self, render: bool = False, seed = 42, n_angles = 12, num_opps = 9,  add_noise = True, draw_lidar = False, get_histoy= False):
         super(CustomEnv, self).__init__()
         np.random.seed(seed)
         self.decision = ReinforcementLearningDecision()
         self.add_noise = add_noise
         self.n_angles = n_angles
+        self.get_history = get_histoy
         self.simulation = Simulation(self.decision, render=render, num_opps=num_opps, lidar_angles=n_angles, draw_lidar=draw_lidar)
         self.hold_history = render
         self.reset()
@@ -35,12 +36,9 @@ class CustomEnv(gym.Env):
             -MAX_WHEEL_SPEED,
             -MAX_WHEEL_SPEED,
             -MAX_WHEEL_SPEED,
-            -MAX_VELOCITY,     # Min velocity 
-            -MAX_VELOCITY,
-            -MAX_ANGULAR       #Min Angular
         ] + 
         [0] * self.n_angles, # Lidar reads
-        dtype=np.float32).reshape(10 + self.n_angles,1)
+        dtype=np.float32).reshape(7 + self.n_angles,1)
 
         obs_high = np.array([
             MAX_DIST,      # Max relative x-position
@@ -50,12 +48,9 @@ class CustomEnv(gym.Env):
             MAX_WHEEL_SPEED,
             MAX_WHEEL_SPEED,
             MAX_WHEEL_SPEED,
-            MAX_VELOCITY,   # Max velocity
-            MAX_VELOCITY,
-            MAX_ANGULAR    # Max angular
         ] + 
         [WIDTH] * self.n_angles, # Lidar reads
-        dtype=np.float32).reshape(10 + self.n_angles,1)
+        dtype=np.float32).reshape(7 + self.n_angles,1)
         return obs_low, obs_high
 
     def reset(self):
@@ -71,7 +66,7 @@ class CustomEnv(gym.Env):
     def step(self, action):
         self.previous_ws = self.simulation.get_player_ws()
         self.decision.set_ws(action)
-        self.simulation.run(RL_STEPS,self.hold_history, False, target=np.concatenate((self.target_position, np.reshape(self.target_psi,(1,1)))))
+        self.simulation.run(RL_STEPS,self.hold_history, self.get_history, target=np.concatenate((self.target_position, np.reshape(self.target_psi,(1,1)))))
         obs = self.get_observation()
 
         reward = self.compute_reward()
@@ -83,7 +78,6 @@ class CustomEnv(gym.Env):
         player_pos = self.simulation.get_player_pos().copy()
         player_psi = self.simulation.get_player_psi()
         player_ws = self.simulation.get_player_ws()
-        player_v = self.simulation.get_player_vs()
         lidar_read = self.simulation.get_player_lidar_read().copy()
         target_pos = self.target_position.copy()
         target_psi = self.target_psi
@@ -112,7 +106,7 @@ class CustomEnv(gym.Env):
         relative_psi = np.reshape(constrain_angle(target_psi - player_psi), (1, 1))
 
         # Return the concatenated observation
-        return np.concatenate((relative_pos_agent_frame, relative_psi, player_ws, player_v, lidar_read))
+        return np.concatenate((relative_pos_agent_frame, relative_psi, player_ws, lidar_read))
 
     
     def get_observation_space_size(self):
@@ -130,6 +124,7 @@ class CustomEnv(gym.Env):
         player_position = self.simulation.get_player_pos()
         player_ws = self.simulation.get_player_ws()
         player_v = np.linalg.norm(self.simulation.get_player_vs()[:2])
+        ws_norm = np.linalg.norm(player_ws)
         lidar_read = self.simulation.get_player_lidar_read()
 
         angle_diff = abs(constrain_angle(player_psi - self.target_psi))
@@ -144,11 +139,11 @@ class CustomEnv(gym.Env):
         max_ws_diff_norm = 4 * MAX_WHEEL_SPEED
         ws_reward = -ws_diff_norm/max_ws_diff_norm
     
-        reward = dist_reward + 0.1 * angle_reward + 0.002 * ws_reward
+        reward = dist_reward + 0.1 * angle_reward + 0.005 * ws_reward
 
         for read in lidar_read:
-            if read < PLAYER_RADIUS:
-                reward -= 1.2
+            if read < 1.5*PLAYER_RADIUS:
+                reward -= 1.5
         
         if dist < POSITION_TOLERANCE:
             reward += 0.05
@@ -156,6 +151,8 @@ class CustomEnv(gym.Env):
             reward += 0.01
         if player_v < VELOCITY_TOLERANCE:
             reward += 0.02
+        if ws_norm < WS_NORM_TOLERANCE:
+            reward += 0.01
 
         if self.succesfull_finish():
             # Large bonus for reaching the desired state
@@ -168,7 +165,8 @@ class CustomEnv(gym.Env):
         player_angle = self.simulation.get_player_psi()
         return (np.linalg.norm(player_position - self.target_position) < POSITION_TOLERANCE and
                 abs(constrain_angle(player_angle - self.target_psi)) < ANGLE_TOLERANCE and
-                np.linalg.norm(self.simulation.get_player_vs()[:2]) < VELOCITY_TOLERANCE)
+                np.linalg.norm(self.simulation.get_player_vs()[:2]) < VELOCITY_TOLERANCE and
+                np.linalg.norm(self.simulation.get_player_ws()) < WS_NORM_TOLERANCE)
 
     def player_inside_field(self):
         pos = self.simulation.get_player_pos()

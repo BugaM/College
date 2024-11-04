@@ -40,8 +40,8 @@ def train(render, total_timesteps, max_episode_steps):
 
     # Set up EvalCallback
     eval_callback = EvalCallback(eval_env, 
-                                 best_model_save_path='./noised_model/',
-                                 log_path='./noised_model/',
+                                 best_model_save_path='./noised_model_final/',
+                                 log_path='./noised_model_final/',
                                  eval_freq=10000,  # Evaluate every 10000 timesteps
                                  deterministic=True, 
                                  render=False)
@@ -50,7 +50,7 @@ def train(render, total_timesteps, max_episode_steps):
     model.learn(total_timesteps=total_timesteps, progress_bar=True, callback=eval_callback)  # Adjust the timesteps as needed
 
     # Save the model
-    model.save("ssl_model_noised_2")
+    model.save("ssl_model_noised_final")
 
     print("Finished training")
 
